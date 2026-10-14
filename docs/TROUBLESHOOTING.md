@@ -14,6 +14,43 @@ Invoke-RestMethod http://127.0.0.1:3080/mcp-studio-api/health
 
 اگر فرمان دوم پاسخ داد ولی پنل چیزی نشان نمی‌دهد، مشکل در مرورگر است؛ اگر پاسخ نداد، مشکل در میزبان.
 
+## کدام تغییر به کدام کار نیاز دارد
+
+قبل از هر چیز این تفاوت را بدان، چون بیشتر «هنوز عوض نشده»ها از همین‌جاست:
+
+| چه چیزی عوض شده | چه کاری لازم است |
+| --- | --- |
+| کد نیمهٔ مرورگر (پنل، استایل، ترجمه) | **نوکردن صفحه** در مرورگر (F5 / Ctrl+R) |
+| کد نیمهٔ میزبان (سرویس، مسیر HTTP، انبار) | **ریاستارت Harness**: بستن و اجرای دوبارهٔ `dsh web` |
+| `cordis.patch.yml` | خودش داغ اعمال می‌شود (`patchReload: live`)؛ اگر اثر نکرد، ریاستارت |
+
+اگر امروز چیزی را عوض کرده‌ای و اثرش را نمی‌بینی، معمولاً هر دو کار لازم است: یک بار صفحه را نو کن،
+و اگر باز هم نشد Harness را ریاستارت کن.
+
+## پنل سفید باز می‌شود (صفحهٔ خالی)
+
+یعنی بستهٔ مرورگری که اجرا می‌شود با چیزی که روی دیسک است نمی‌خواند، یا نیمهٔ میزبان قدیمی‌تر از
+نیمهٔ مرورگر است.
+
+۱. **صفحه را نو کن** (F5 یا Ctrl+R). بیشتر وقت‌ها همین کافی است، چون بستهٔ کلاینت در مرورگر حافظهٔ نهان
+   می‌شود و نسخهٔ قدیمی تا نوکردن صفحه بیرون نمی‌رود.
+۲. اگر باز هم سفید بود، **Harness را ریاستارت کن**: ببند و دوباره `dsh web` اجرا کن. این کار وقتی لازم
+   است که بستهٔ میزبان از کلاینت عقب‌تر باشد.
+۳. اگر آیکن در نوار کناری هست ولی بدنهٔ پنل سفید می‌ماند، بررسی کن خطای «main panel "mcp-studio" is not
+   registered» در کنسول مرورگر نباشد؛ این یعنی نیمهٔ میزبان پنل را ثبت نکرده و ریاستارت لازم است.
+۴. اگر مخزن را کنار همین نصب داری، `lib/client.js` را در نسخهٔ نصب‌شده با نسخهٔ مخزن مقایسه کن؛
+   فرق داشتنشان یعنی نصب‌شده قدیمی است و باید با نصب‌کننده دوباره نصب شود.
+
+## پنل با تم هارنس هماهنگ نیست
+
+پنل رنگ‌هایش را از توکن‌های تم خودِ Harness (`--dsw-*`) می‌گیرد و باید با تنظیم Appearance (روشن/تاریک)
+یکی باشد. اگر نیست:
+
+- **صفحه را نو کن.** اگر بستهٔ کلاینت قدیمی در مرورگر مانده باشد، استایل قدیمی هم مانده است.
+- اگر باز هم ناهماهنگ بود، Harness را ریاستارت کن (بستهٔ کلاینت تازه در همان بالا آمدن سرو می‌شود).
+- پنل کلید تنظیم تم جداگانه ندارد؛ هر چه در Appearance انتخاب کرده‌ای، همان اعمال می‌شود. اگر بخشی از
+  پنل با بقیه نمی‌خواند، آن یک باگ است، نه تنظیم — گزارشش کن.
+
 ---
 
 ## آیکن استودیوی MCP در نوار کناری نیست
@@ -53,10 +90,37 @@ powershell -ExecutionPolicy Bypass -File .\install.ps1 -Manual
 
 اگر سروری به راز نیاز دارد و راز ذخیره نشده باشد، آزمون با پیام نبود راز شکست می‌خورد — بخش «رازها» را ببین.
 
+## خطای `namespace-in-use` — فضای نام ابزارها قبلاً گرفته شده
+
+| کد | معنی و کار پیشنهادی |
+| --- | --- |
+| `namespace-in-use` | فضای نام `mcp__<نام سرور>__*` از قبل مالِ یک سرور MCP بیرون از این پنل است. |
+
+هر سرور MCP ابزارهایش را زیر `mcp__<نام سرور>__*` ثبت می‌کند و این فضای نام انحصاری است. اگر سروری
+بیرون از استودیوی MCP همان نام را گرفته باشد، پنل نصب را **از پیش** رد می‌کند و همین کد را نشان می‌دهد،
+به‌جای پیام خام «tool … is already registered» که چیزی دربارهٔ علت نمی‌گفت.
+
+این حالت معمولاً یعنی در `<profile>/cordis.patch.yml` یک ردیف `@deepseek-ai/dsh-mcp-client` هست.
+پروفایل‌های همراه از پیش `mcp__memory__*` و `mcp__filesystem__*` را تعریف می‌کنند، پس نصب یک سرور
+`filesystem` از کاتالوگ با نام پیش‌فرض دقیقاً به همین برخورد می‌خورد.
+
+دو راه‌حل:
+
+۱. **نام سرور دیگری انتخاب کن** (فیلد «نام سرور» در فرم). مثلاً `filesystem2` یا `fs-work` — فضای نام
+   ابزارها هم به همان شکل عوض می‌شود.
+۲. **اگر آن سرور را دیگر لازم نداری**، ردیفش را از `<profile>/cordis.patch.yml` بردار. اگر Harness
+   در حال اجراست، `patchReload: live` این تغییر را داغ اعمال می‌کند.
+
+فهرست سرورهایی که همین حالا فضای نام‌ها را گرفته‌اند با این فرمان دیده می‌شود:
+
+```powershell
+dsh --profile web --dump-config | Select-String "serverName"
+```
+
 ## سرور نصب شد ولی وصل نمی‌شود
 
 - روی **راه‌اندازی دوباره** بزن. اتصال خودکار دوباره وجود ندارد؛ سروری که یک بار خطا داده در همان وضعیت می‌ماند.
-- **گشودن جزئیات → لاگ‌ها** را ببین؛ دلیل واقعی معمولاً آنجاست.
+- **ویرایش → لاگ‌ها** را ببین؛ کشو روی تب «تنظیمات» باز می‌شود و تب «لاگ‌ها» کنارش است. دلیل واقعی معمولاً آنجاست.
 - اگر سرور `stdio` است، محیط فرایند از محیط پاک‌سازی‌شدهٔ Harness ساخته می‌شود. اگر ابزاری فقط وقتی
   کار می‌کند که یک متغیر محیطی در ترمینال تنظیم باشد، آن متغیر را در فرم سرور (بخش Environment) هم بگذار.
 - برای سرورهای `npx`، اولین اجرا ممکن است بسته را دانلود کند و از مهلت رد شود. یک بار دستی اجرا کن تا
@@ -160,6 +224,17 @@ Start with `dsh --profile web --dump-config | Select-String "mcp-studio"` and
   `-Manual`.
 - **"host half is not answering":** the `/mcp-studio-api` route was not registered; look for
   `MCP Studio API ready` in the harness log.
+- **Blank white panel:** refresh the page first (client bundles are cached in the browser); if it is still
+  blank, restart `dsh web` (the host bundle is older than the client). Remember the split: **client-side
+  changes need a page refresh, host-side changes need a harness restart** — and a change that touched both
+  needs both.
+- **Panel does not match the harness theme:** it paints from the harness `--dsw-*` tokens and has no theme
+  switch of its own, so refresh the page, then restart the harness; if only part of the panel is off, that
+  is a bug, not a setting.
+- **`namespace-in-use`:** the tool namespace `mcp__<name>__*` is already owned by an MCP server outside the
+  panel — usually a row in `<profile>/cordis.patch.yml`, where the shipped profiles define `mcp__memory__*`
+  and `mcp__filesystem__*`. Pick another server name, or remove that row. The panel refuses this up front
+  instead of surfacing the bridge's raw "tool … is already registered".
 - **Probe failures** are classified as `command-missing`, `spawn-failed`, `http-error`,
   `handshake-failed`, `timeout`, `invalid-config` — each has a concrete next step above.
 - **A server that died** stays in `error` until you press **Restart**; there is no auto-reconnect.

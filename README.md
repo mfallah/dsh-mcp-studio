@@ -68,6 +68,7 @@ bash install.sh             # نصب
 | مدیریت رازها | مقادیر با `${secret:NAME}` در پیکربندی ارجاع داده می‌شوند و هرگز به مرورگر فرستاده نمی‌شوند |
 | برون‌ریزی patch | کل وضعیت را به‌صورت یک بلوک `cordis.patch.yml` می‌دهد، برای وقتی که بخواهی افزونه را کنار بگذاری |
 | فارسی و RTL | افزونه خودش بستهٔ زبان «فارسی» را ثبت می‌کند؛ پنل دوزبانه است و جهت متن را از زبان فعال Harness می‌گیرد |
+| تم هارنس | رنگ‌ها از توکن‌های `--dsw-*` خودِ Harness می‌آیند، پس پنل با تنظیم Appearance (روشن/تاریک) هماهنگ می‌ماند |
 
 ## امنیت: چه چیزی روی رایانهٔ تو اجرا می‌شود
 
@@ -129,9 +130,10 @@ MIT — [LICENSE](LICENSE)
 
 **MCP Studio** is a DeepSeek Harness plugin that adds a visual, Persian-first (RTL) panel to the harness
 web GUI: browse a catalog of MCP servers, install and connect them through a form, test the connection
-before saving, and watch each server's tools and logs. Server definitions live in the plugin's own store
-(`$DSH_HOME/mcp-studio/`), so your profile's `cordis.patch.yml` stays yours and no restart is needed to
-add or remove a server.
+before saving, and watch each server's tools and logs. The panel paints from the harness's own `--dsw-*`
+theme tokens, so it follows the active Appearance setting (light or dark). Server definitions live in the
+plugin's own store (`$DSH_HOME/mcp-studio/`), so your profile's `cordis.patch.yml` stays yours and no
+restart is needed to add or remove a server.
 
 **Install (Windows / PowerShell):**
 

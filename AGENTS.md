@@ -61,6 +61,14 @@ bash scripts/test-install.sh                           # Git-Bash / WSL / macOS 
   `@deepseek-ai/schemastery`, supplied by the harness. The package exports only
   `.`, `./client` and `./package.json` — there is no Typert subpath, because the
   panel talks over its owned HTTP route instead (see `docs/DESIGN.md` §4.2).
+- **Theme through the harness.** The panel paints from harness `--dsw-*` tokens and
+  inherits the Appearance setting; `styles.ts` may only reference names listed in
+  `src/client/theme-tokens.ts`, and `tests/client/theme-tokens.test.ts` enforces it.
+  An invented token with a dark fallback is what once rendered the panel dark in
+  light mode, so add a token only after finding it in the shipped theme package.
+- **Client fixes need a refresh, host fixes a restart.** The browser half is a cached
+  bundle; the host half loads at boot. `docs/TROUBLESHOOTING.md` carries the
+  user-facing version of that split — keep it there when either half changes.
 - **Docs track code.** `docs/*.md` and `README.md` describe behaviour that
   exists. When the code changes, change the docs in the same change; when
   something is not implemented, say so in `docs/TROUBLESHOOTING.md`.

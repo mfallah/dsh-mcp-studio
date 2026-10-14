@@ -41,5 +41,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `./remote` subpaths and the `@deepseek-ai/dsh-typert-protocol` / `zod` dependencies
   were removed: the panel reaches its host half over an owned HTTP route, because
   `@deepseek-ai/dsh-api-remotes` fixes its reachable capability set at build time.
+- The panel now follows the harness Appearance setting (light or dark). It paints
+  from the harness's own `--dsw-*` theme tokens and may only reference names listed in
+  `src/client/theme-tokens.ts`; an invented token name with a dark fallback was what
+  made the panel render dark in light mode.
+
+### Fixed
+
+- The panel no longer crashes on first render. `src/client/face.ts` wraps the locale
+  service so `getSnapshot`/`subscribe` keep their receiver and their identity across
+  renders; `useDirection` memoises the store and type-checks the snapshot. Previously
+  the whole panel rendered as a blank white page for every user.
+- A tool-namespace collision is now reported up front as `namespace-in-use`. When
+  `mcp__<name>__*` is already owned by an MCP server outside MCP Studio — typically a
+  row in `<profile>/cordis.patch.yml`, where the shipped profiles define
+  `mcp__memory__*` and `mcp__filesystem__*` — the add is refused with an actionable
+  message instead of the bridge's raw "tool … is already registered" after a spawn
+  attempt. `install.ps1`/`install.sh` are unaffected.
 
 [Unreleased]: https://github.com/mfallah/dsh-mcp-studio/commits/main

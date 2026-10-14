@@ -7,6 +7,9 @@
 یک نوار تشخیص محیط اجرا داری. کشوی جزئیات هر سرور سه تب «ابزارها»، «لاگ‌ها» و «تنظیمات» دارد، و کارت
 **رازها** پایین تب «نصب‌شده‌ها» است.
 
+رنگ‌های پنل از توکن‌های تم خودِ Harness (`--dsw-*`) می‌آیند، پس پنل با هر تنظیمی که در Appearance
+انتخاب کرده‌ای هماهنگ می‌شود؛ حالت روشن و تاریک هر دو پشتیبانی می‌شوند و تنظیم جداگانه‌ای لازم نیست.
+
 ## باز کردن پنل
 
 ۱. Harness را اجرا کن: `dsh web`
@@ -119,6 +122,11 @@
   نام ابزارها می‌آید، و کوتاه‌کردن خودکار یعنی فضای نامی که تو انتخابش نکرده‌ای. اگر نام را خالی بگذاری،
   افزونه یکی از روی عنوان می‌سازد.
 - اگر نام انتخابی‌ات از قبل روی سرور دیگری باشد، با خطای `duplicate-server-name` رد می‌شود.
+- اگر فضای نام ابزارها (`mcp__<نام سرور>__*`) از قبل مالِ سرور MCP دیگری باشد — بیشتر وقت‌ها ردیفی در
+  `<profile>/cordis.patch.yml` بیرون از این پنل، مثلاً `mcp__memory__*` یا `mcp__filesystem__*` که
+  پروفایل‌های همراه از پیش تعریف می‌کنند — نصب با خطای `namespace-in-use` رد می‌شود. راه‌حل: نام سرور
+  دیگری انتخاب کن، یا اگر دیگر لازمش نداری آن ردیف را از `cordis.patch.yml` بردار. (پیش‌تر این تضاد
+  فقط بعد از تلاش برای اتصال، با پیام خام «tool … is already registered» دیده می‌شد.)
 - نوع حمل‌ونقل فقط `stdio` یا `streamable-http` است. مقدار ناشناخته با خطای `invalid-transport` رد
   می‌شود و به‌جای آن `stdio` فرض نمی‌شود.
 - دکمهٔ پایانی **افزودن و اتصال** است: سرور ذخیره و بی‌درنگ سوار می‌شود.
@@ -161,7 +169,8 @@
   «راه‌اندازی دوباره» را بزنی.
 - لاگ‌ها فقط در حافظه‌اند و با ریاستارت Harness پاک می‌شوند.
 - فهرست رجیستری تا ۵ دقیقه از حافظهٔ نهان خوانده می‌شود؛ برای دیدن نتیجهٔ تازه، کمی صبر کن یا پنل را نو کن.
-- پنل سرورها را با نام فضای نام صدا می‌زند؛ اگر ابزار میان‌راهی ثالثی هم‌نام سرور تو باشد، تضاد پیش می‌آید.
+- فضای نام ابزارها انحصاری است: اگر سرور دیگری بیرون از پنل همان `mcp__<نام>__*` را در اختیار داشته باشد،
+  پنل نصب را از پیش با خطای `namespace-in-use` رد می‌کند و راه‌حل را هم می‌گوید.
 
 </div>
 
@@ -180,6 +189,11 @@ silent) and **Settings** (title, description, fail-on-startup, per-call timeout,
 **secrets** card sits under the Installed tab: names only, add/rotate/delete one at a time. A runtime
 banner above the tabs lists any of `node`, `npx`, `npm`, `pnpm`, `bunx`, `uvx`, `python`, `docker` that is
 missing, with a one-line install command. **Export patch** renders the current state as a
-`cordis.patch.yml` block in a copyable overlay — the panel never writes the file itself. Known gaps: no
-SSE/OAuth transports, no automatic reconnection, logs are memory-only, and the registry result is cached
-for five minutes.
+`cordis.patch.yml` block in a copyable overlay — the panel never writes the file itself. The panel paints
+from the harness's `--dsw-*` theme tokens, so it follows the active Appearance setting (light or dark)
+with no separate switch. Server names are validated on save: `invalid-server-name`, `duplicate-server-name`
+and `invalid-transport` are refused outright, and `namespace-in-use` fires when the tool namespace
+`mcp__<name>__*` is already owned by an MCP server outside the panel (typically a row in
+`<profile>/cordis.patch.yml`, where the shipped profiles define `mcp__memory__*` and `mcp__filesystem__*`) —
+pick another name or remove that row. Known gaps: no SSE/OAuth transports, no automatic reconnection, logs
+are memory-only, and the registry result is cached for five minutes.
