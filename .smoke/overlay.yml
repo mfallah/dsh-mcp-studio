@@ -1,0 +1,20 @@
+# Isolated verification overlay — NOT part of the shipped bundle.
+#
+# Boots the web profile a second time with MCP Studio mounted on its own port,
+# so the live GUI and the live profile config are untouched:
+#
+#   dsh --profile web --patch <this file> --port 3099 --no-open
+#
+# `name:` is the bare package specifier, which resolves through the profile's
+# node_modules exactly as a real `dsh plugin add` install would. The verification
+# script links `<profile>/node_modules/@mfallah/dsh-mcp-studio` at the working
+# tree for the duration of the test.
+- insert:
+    - id: mcp-studio-smoke
+      name: '@mfallah/dsh-mcp-studio'
+      config:
+        catalogEnabled: false
+        storeDir: 'F:/harness/.smoke/store'
+        probeTimeoutMs: 15000
+        mountTimeoutMs: 30000
+        logLinesPerServer: 200

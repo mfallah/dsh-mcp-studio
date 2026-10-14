@@ -1,0 +1,110 @@
+{
+  "_comment": "Hand-authored fixture modelled on the documented MCP registry v0.1 preview body (GET /v0.1/servers). The registry host was unreachable from this machine, so this is NOT a live recording: it reproduces the documented `{ servers: [{ server, _meta }] }` shape plus entries exercising normalization, remotes, oci packages and malformed input.",
+  "servers": [
+    {
+      "server": {
+        "name": "io.github.modelcontextprotocol/server-everything",
+        "title": "Everything",
+        "description": "Reference server exposing every MCP feature.",
+        "version": "1.0.0",
+        "websiteUrl": "https://github.com/modelcontextprotocol/servers",
+        "repository": { "url": "https://github.com/modelcontextprotocol/servers", "source": "github" },
+        "packages": [
+          {
+            "registryType": "npm",
+            "identifier": "@modelcontextprotocol/server-everything",
+            "version": "1.0.0",
+            "runtimeHint": "npx",
+            "transport": { "type": "stdio" },
+            "environmentVariables": [
+              {
+                "name": "LOG_LEVEL",
+                "description": "Verbosity of the server log.",
+                "isRequired": false,
+                "default": "info",
+                "choices": ["debug", "info", "warn", "error"]
+              }
+            ]
+          }
+        ]
+      },
+      "_meta": {
+        "io.modelcontextprotocol.registry/official": {
+          "status": "active",
+          "isLatest": true,
+          "publishedAt": "2025-01-01T00:00:00Z"
+        }
+      }
+    },
+    {
+      "server": {
+        "name": "io.github.example/demo-fetch",
+        "title": "Demo Fetch",
+        "description": "Fetch pages and convert them to markdown.",
+        "version": "2.1.0",
+        "packages": [
+          {
+            "registryType": "pypi",
+            "identifier": "demo-fetch",
+            "runtimeHint": "uvx",
+            "environmentVariables": [
+              {
+                "name": "DEMO_API_KEY",
+                "description": "API key for the demo service.",
+                "isRequired": true,
+                "isSecret": true
+              }
+            ],
+            "arguments": [
+              {
+                "name": "ALLOWED_HOSTS",
+                "description": "Comma separated host allow-list.",
+                "isRequired": true,
+                "format": "string",
+                "placeholder": "example.com,localhost"
+              }
+            ]
+          }
+        ]
+      },
+      "_meta": {
+        "io.modelcontextprotocol.registry/official": { "isLatest": true }
+      }
+    },
+    {
+      "server": {
+        "name": "com.example/remote-search",
+        "title": "Remote Search",
+        "description": "Hosted search endpoint.",
+        "version": "0.9.0",
+        "remotes": [
+          { "transportType": "streamable-http", "url": "https://search.example.com/mcp" }
+        ]
+      }
+    },
+    {
+      "server": {
+        "name": "com.example/oci-tool",
+        "title": "Container Tool",
+        "packages": [
+          {
+            "registryType": "oci",
+            "identifier": "docker.io/example/tool:1.2.3",
+            "runtimeHint": "docker"
+          }
+        ]
+      }
+    },
+    {
+      "server": {
+        "name": "com.example/legacy-sse",
+        "title": "Legacy SSE",
+        "remotes": [{ "transportType": "sse", "url": "https://old.example.com/sse" }]
+      }
+    },
+    { "server": { "name": "com.example/no-launch-target", "packages": [] } },
+    { "bogus": true },
+    "not-an-object"
+  ],
+  "metadata": { "count": 7, "nextCursor": "cursor-page-2" }
+}

@@ -1,0 +1,16 @@
+# Keep every text file LF in the working tree as well as the repository.
+#
+# The build is committed (`lib/`), and the shipped `install.sh` must not gain
+# CRLF endings on a Windows checkout: bash treats a CR as part of the command
+# name and the script fails with "bad interpreter" or "command not found".
+# Declaring `eol=lf` makes the checkout deterministic regardless of the
+# contributor's `core.autocrlf` setting.
+* text=auto eol=lf
+
+# Binary assets that must never be line-ending converted.
+*.png binary
+*.jpg binary
+*.webp binary
+*.ico binary
+*.woff binary
+*.woff2 binary

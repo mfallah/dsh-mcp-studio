@@ -1,0 +1,5 @@
+# pnpm 11 reads build-script approval from here, not from package.json.
+# esbuild's postinstall installs its platform binary; without this a clean
+# checkout has no working bundler.
+allowBuilds:
+  esbuild: true

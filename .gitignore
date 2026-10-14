@@ -1,0 +1,13 @@
+node_modules/
+# NOTE: lib/ is intentionally NOT ignored. DSH loads the prebuilt client bundle
+# (`lib/client.js`) at boot and refuses to activate a plugin whose bundle is
+# missing; `exports["./client"]` points straight at it. Committing the build
+# output is what makes `dsh plugin --profile web add <git-url>` work with no
+# build step on the user's machine. CI rebuilds it and fails on a diff.
+*.tsbuildinfo
+.vitest/
+coverage/
+.tmp/
+*.log
+.DS_Store
+Thumbs.db

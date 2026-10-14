@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+
+# One run per ref; a new push cancels the previous in-flight run.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: typecheck / build / test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      # --frozen-lockfile means pnpm-lock.yaml must be committed and current;
+      # a package.json change without a relocked pnpm-lock.yaml fails here.
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm run typecheck
+
+      - name: Build
+        run: pnpm run build
+
+      # lib/ is committed (see .gitignore): DSH loads the prebuilt client bundle
+      # at boot, so the shipped output must match src/. Rebuilding here and
+      # diffing is what keeps a git-URL install working with no build step.
+      - name: Check the committed build output is current
+        run: git diff --exit-code -- lib
+
+      - name: Test
+        run: pnpm test
+
+      - name: Check docs for leftover placeholders
+        run: node scripts/check-docs.mjs

@@ -1,0 +1,23 @@
+# Bundle layer contributed by @mfallah/dsh-mcp-studio.
+#
+# The DSH profile launcher applies this file after the shipped bundle layers and
+# before the user's own `cordis.patch.yml`, so installing the package is enough:
+# the entry below is what mounts the plugin.
+#
+#   dsh plugin --profile web add @mfallah/dsh-mcp-studio
+#
+# Everything the plugin needs at run time lives in its own store under
+# $DSH_HOME/mcp-studio/, never in this file.
+- insert:
+    - id: mcp-studio
+      name: '@mfallah/dsh-mcp-studio'
+      config:
+        # Keep the official MCP registry lookup on; disable it to render the
+        # curated offline catalog only.
+        catalogEnabled: true
+        registryUrl: https://registry.modelcontextprotocol.io
+        # Connection probes are bounded so a dead server cannot stall the UI.
+        # The generous budgets cover a cold `npx -y` download, which is the
+        # normal first-run cost of a stdio server.
+        probeTimeoutMs: 60000
+        mountTimeoutMs: 90000
