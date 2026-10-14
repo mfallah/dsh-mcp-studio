@@ -90,6 +90,7 @@ export const LOCALE_KEYS = [
   'probeCodeHandshakeFailed',
   'probeCodeTimeout',
   'probeCodeInvalidConfig',
+  'probeCodeNamespaceInUse',
   'installAction',
   'installing',
   'installFailed',

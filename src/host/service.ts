@@ -196,6 +196,22 @@ export class McpStudioService implements McpStudioApi {
         `server name "${requested}" is already used by "${clash.title}"`,
       )
     }
+    // A namespace can also be claimed by a server this plugin does NOT manage —
+    // typically a row in the profile's `cordis.patch.yml`, where the shipped
+    // profiles already define `mcp__memory__*` and `mcp__filesystem__*`. The
+    // bridge then refuses the mount with "tool ... is already registered", which
+    // is accurate but says nothing about what to do. Detect it before we even
+    // spawn a process and name the real cause.
+    if (
+      (clash === undefined || clash.id !== options.id) &&
+      this.deps.supervisor.toolsFor(requested).length > 0
+    ) {
+      throw new McpStudioError(
+        'namespace-in-use',
+        `the tool namespace "mcp__${requested}__*" is already provided by an MCP server outside ` +
+          `MCP Studio (for example a row in the profile's cordis.patch.yml). Choose a different server name.`,
+      )
+    }
 
     const now = new Date().toISOString()
     const base = {
@@ -204,9 +220,9 @@ export class McpStudioService implements McpStudioApi {
       title,
       description: clean(draft.description, 600) || undefined,
       enabled: options.existing?.enabled ?? true,
-      source: options.existing?.source ?? ('custom' as const),
-      catalogId: options.existing?.catalogId,
-      homepage: options.existing?.homepage,
+      source: draft.source ?? options.existing?.source ?? ('custom' as const),
+      catalogId: draft.catalogId ?? options.existing?.catalogId,
+      homepage: draft.homepage ?? options.existing?.homepage,
       failOnStartupError: draft.failOnStartupError ?? options.existing?.failOnStartupError ?? false,
       toolCallTimeoutMs:
         typeof draft.toolCallTimeoutMs === 'number' && draft.toolCallTimeoutMs > 0
@@ -515,6 +531,7 @@ export class McpStudioService implements McpStudioApi {
 /** Map a raw probe failure onto the contract's failure classes. */
 function classifyProbeError(message: string): ProbeResult['code'] {
   const text = message.toLowerCase()
+  if (text.includes('already registered')) return 'namespace-in-use'
   if (text.includes('enoent') || text.includes('not found') || text.includes('not recognized')) {
     return 'command-missing'
   }

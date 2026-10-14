@@ -163,6 +163,13 @@ export interface ServerDraft {
   title: string
   description?: string
   serverName?: string
+  /**
+   * Provenance. `installFromCatalog` fills these in so an entry installed from
+   * the catalog keeps its origin in the panel instead of looking hand-made.
+   */
+  source?: ServerSource
+  catalogId?: string
+  homepage?: string
   /** stdio */
   command?: string
   args?: string[]
@@ -175,8 +182,11 @@ export interface ServerDraft {
   toolCallTimeoutMs?: number
 }
 
-/** Update payload: every field optional; omitted fields keep their value. */
-export type ServerPatch = Partial<Omit<ServerDraft, 'transport'>> & {
+/**
+ * Update payload: every field optional; omitted fields keep their value.
+ * Provenance is excluded — a caller must not be able to relabel a server.
+ */
+export type ServerPatch = Partial<Omit<ServerDraft, 'transport' | 'source' | 'catalogId' | 'homepage'>> & {
   enabled?: boolean
 }
 
@@ -213,6 +223,7 @@ export interface ProbeResult {
     | 'handshake-failed'
     | 'timeout'
     | 'invalid-config'
+    | 'namespace-in-use'
   /** Server self-reported name and version on success. */
   serverInfo?: { name: string; version: string }
   /** Discovered tool raw names on success. */

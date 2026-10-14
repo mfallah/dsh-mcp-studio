@@ -1,0 +1,331 @@
+{
+  "console": [],
+  "steps": [
+    {
+      "step": "bundle materialized",
+      "ok": true,
+      "exports": [
+        "McpStudioController",
+        "RPC_HEADER",
+        "RPC_PATH",
+        "StudioRpcError",
+        "apply",
+        "createHttpTransport",
+        "createStudioApi",
+        "inject"
+      ]
+    }
+  ],
+  "errors": [],
+  "uncaught": [],
+  "unhandled": [],
+  "fetchTimes": [],
+  "html": "{\n  \"stable-locale (real LocaleRuntime contract)\": {\n    \"error\": null,\n    \"htmlLength\": 3836,\n    \"html\": \"<div class=\\\"mcp-studio\\\" dir=\\\"rtl\\\" lang=\\\"fa\\\"><header class=\\\"mcp-header\\\"><div class=\\\"mcp-header-top\\\"><div class=\\\"mcp-header-titles\\\"><h1>استودیوی MCP</h1><p class=\\\"mcp-subtitle\\\">سرورهای MCP را ببین، نصب کن، وصل شو و مدیریت کن — بدون دست‌زدن به YAML.</p></div><div class=\\\"mcp-header-actions\\\"><button type=\\\"button\\\" class=\\\"mcp-btn\\\" data-variant=\\\"secondary\\\" data-busy=\\\"false\\\" data-icon-only=\\\"false\\\"><span>برون‌ریزی patch</span></button><button type=\\\"button\\\" class=\\\"mcp-btn\\\" data-variant=\\\"secondary\\\" data-busy=\\\"false\\\" data-icon-only=\\\"false\\\"><span>تازه‌سازی</span></button></div></div><div class=\\\"mcp-tabs\\\" role=\\\"tablist\\\" aria-label=\\\"استودیوی MCP\\\"><button type=\\\"button\\\" role=\\\"tab\\\" id=\\\"mcp-tab-catalog\\\" class=\\\"mcp-tab\\\" aria-selected=\\\"true\\\" aria-controls=\\\"mcp-tabpanel-catalog\\\" tabindex=\\\"0\\\">کاتالوگ</button><button type=\\\"button\\\" role=\\\"tab\\\" id=\\\"mcp-tab-installed\\\" class=\\\"mcp-tab\\\" aria-selected=\\\"false\\\" aria-controls=\\\"mcp-tabpanel-installed\\\" tabindex=\\\"-1\\\">نصب‌شده‌ها</button></div></header><div class=\\\"mcp-body\\\"><div class=\\\"mcp-stack\\\"><section class=\\\"mcp-card\\\" aria-label=\\\"زمان‌های اجرای محلی\\\"><div class=\\\"mcp-card-head\\\"><div class=\\\"mcp-card-main\\\"><span class=\\\"mcp-card-title\\\">8 زمان اجرا پیدا نشد</span><span class=\\\"mcp-hint\\\">سرورهایی که به زمان اجرای غایب نیاز دارند بالا نمی‌آیند. با فرمانی که نشان داده شده نصبش کن و بعد تازه‌سازی کن.</span></div></div><div class=\\\"mcp-card-body\\\"><ul class=\\\"mcp-stack\\\" style=\\\"gap: 4px; margin: 0px; padding-inline-start: 18px;\\\"><li><span class=\\\"mcp-mono\\\">node</span> <span class=\\\"mcp-tag\\\" data-tone=\\\"warn\\\">غایب</span> <span class=\\\"mcp-hint\\\">Node.js را از nodejs.org نصب کن، یا بزن: winget install OpenJS.NodeJS.LTS</span></li><li><span class=\\\"mcp-mono\\\">npx</span> <span class=\\\"mcp-tag\\\" data-tone=\\\"warn\\\">غایب</span> <span class=\\\"mcp-hint\\\">بزن: npm install -g npm (npx همراه npm 5.2+ می‌آید)</span></li><li><span class=\\\"mcp-mono\\\">npm</span> <span class=\\\"mcp-tag\\\" data-tone=\\\"warn\\\">غایب</span> <span class=\\\"mcp-hint\\\">Node.js را از nodejs.org نصب کن</span></li><li><span class=\\\"mcp-mono\\\">pnpm</span> <span class=\\\"mcp-tag\\\" data-tone=\\\"warn\\\">غایب</span> <span class=\\\"mcp-hint\\\">بزن: corepack enable pnpm</span></li><li><span class=\\\"mcp-mono\\\">bunx</span> <span class=\\\"mcp-tag\\\" data-tone=\\\"warn\\\">غایب</span> <span class=\\\"mcp-hint\\\">Bun را از bun.sh نصب کن</span></li><li><span class=\\\"mcp-mono\\\">uvx</span> <span class=\\\"mcp-tag\\\" data-tone=\\\"warn\\\">غایب</span> <span class=\\\"mcp-hint\\\">بزن: pip install uv (یا: winget install astral-sh.uv)</span></li><li><span class=\\\"mcp-mono\\\">python</span> <span class=\\\"mcp-tag\\\" data-tone=\\\"warn\\\">غایب</span> <span class=\\\"mcp-hint\\\">Python 3 را از python.org نصب کن</span></li><li><span class=\\\"mcp-mono\\\">docker</span> <span class=\\\"mcp-tag\\\" data-tone=\\\"warn\\\">غایب</span> <span class=\\\"mcp-hint\\\">Docker Desktop را از docker.com نصب کن</span></li></ul></div></section><div id=\\\"mcp-tabpanel-catalog\\\" role=\\\"tabpanel\\\" aria-labelledby=\\\"mcp-tab-catalog\\\"><div class=\\\"mcp-stack\\\"><div class=\\\"mcp-row\\\"><div class=\\\"mcp-grow\\\"><label class=\\\"mcp-label\\\" for=\\\"mcp-catalog-search\\\">جست‌وجو در کاتالوگ</label><input id=\\\"mcp-catalog-search\\\" class=\\\"mcp-input\\\" type=\\\"search\\\" placeholder=\\\"جست‌وجو بر پایهٔ نام، سازنده یا برچسب…\\\" value=\\\"\\\"></div><div><label class=\\\"mcp-label\\\" for=\\\"mcp-catalog-source\\\">همهٔ منابع</label><select id=\\\"mcp-catalog-source\\\" class=\\\"mcp-select\\\"><option value=\\\"all\\\">همهٔ منابع</option><option value=\\\"curated\\\">همراه افزونه</option><option value=\\\"registry\\\">رجیستری</option></select></div><button type=\\\"button\\\" class=\\\"mcp-btn\\\" data-variant=\\\"secondary\\\" data-busy=\\\"false\\\" data-icon-only=\\\"false\\\"><span>تازه‌سازی</span></button></div><div class=\\\"mcp-state\\\" data-tone=\\\"empty\\\" role=\\\"status\\\" aria-live=\\\"polite\\\"><p class=\\\"mcp-state-title\\\">کاتالوگ خالی است</p><p class=\\\"mcp-state-body\\\">هیچ سروری برای نصب پیدا نشد. رجیستری را در پیکربندی افزونه روشن کن یا سرور را دستی بیفزای.</p></div></div></div></div></div></div>\"\n  },\n  \"fresh-object-locale (tests/client/render.test.tsx:22)\": {\n    \"error\": null,\n    \"htmlLength\": 3479,\n    \"html\": \"<div class=\\\"mcp-studio\\\" dir=\\\"rtl\\\" lang=\\\"fa\\\"><header class=\\\"mcp-header\\\"><div class=\\\"mcp-header-top\\\"><div class=\\\"mcp-header-titles\\\"><h1>title</h1><p class=\\\"mcp-subtitle\\\">subtitle</p></div><div class=\\\"mcp-header-actions\\\"><button type=\\\"button\\\" class=\\\"mcp-btn\\\" data-variant=\\\"secondary\\\" data-busy=\\\"false\\\" data-icon-only=\\\"false\\\"><span>exportPatch</span></button><button type=\\\"button\\\" class=\\\"mcp-btn\\\" data-variant=\\\"secondary\\\" data-busy=\\\"false\\\" data-icon-only=\\\"false\\\"><span>refresh</span></button></div></div><div class=\\\"mcp-tabs\\\" role=\\\"tablist\\\" aria-label=\\\"title\\\"><button type=\\\"button\\\" role=\\\"tab\\\" id=\\\"mcp-tab-catalog\\\" class=\\\"mcp-tab\\\" aria-selected=\\\"true\\\" aria-controls=\\\"mcp-tabpanel-catalog\\\" tabindex=\\\"0\\\">tabCatalog</button><button type=\\\"button\\\" role=\\\"tab\\\" id=\\\"mcp-tab-installed\\\" class=\\\"mcp-tab\\\" aria-selected=\\\"false\\\" aria-controls=\\\"mcp-tabpanel-installed\\\" tabindex=\\\"-1\\\">tabInstalled</button></div></header><div class=\\\"mcp-body\\\"><div class=\\\"mcp-stack\\\"><section class=\\\"mcp-card\\\" aria-label=\\\"runtimeTitle\\\"><div class=\\\"mcp-card-head\\\"><div class=\\\"mcp-card-main\\\"><span class=\\\"mcp-card-title\\\">runtimeMissingTitle</span><span class=\\\"mcp-hint\\\">runtimeMissingBody</span></div></div><div class=\\\"mcp-card-body\\\"><ul class=\\\"mcp-stack\\\" style=\\\"gap: 4px; margin: 0px; padding-inline-start: 18px;\\\"><li><span class=\\\"mcp-mono\\\">node</span> <span class=\\\"mcp-tag\\\" data-tone=\\\"warn\\\">runtimeMissing</span> <span class=\\\"mcp-hint\\\">runtimeHintNode</span></li><li><span class=\\\"mcp-mono\\\">npx</span> <span class=\\\"mcp-tag\\\" data-tone=\\\"warn\\\">runtimeMissing</span> <span class=\\\"mcp-hint\\\">runtimeHintNpx</span></li><li><span class=\\\"mcp-mono\\\">npm</span> <span class=\\\"mcp-tag\\\" data-tone=\\\"warn\\\">runtimeMissing</span> <span class=\\\"mcp-hint\\\">runtimeHintNpm</span></li><li><span class=\\\"mcp-mono\\\">pnpm</span> <span class=\\\"mcp-tag\\\" data-tone=\\\"warn\\\">runtimeMissing</span> <span class=\\\"mcp-hint\\\">runtimeHintPnpm</span></li><li><span class=\\\"mcp-mono\\\">bunx</span> <span class=\\\"mcp-tag\\\" data-tone=\\\"warn\\\">runtimeMissing</span> <span class=\\\"mcp-hint\\\">runtimeHintBunx</span></li><li><span class=\\\"mcp-mono\\\">uvx</span> <span class=\\\"mcp-tag\\\" data-tone=\\\"warn\\\">runtimeMissing</span> <span class=\\\"mcp-hint\\\">runtimeHintUvx</span></li><li><span class=\\\"mcp-mono\\\">python</span> <span class=\\\"mcp-tag\\\" data-tone=\\\"warn\\\">runtimeMissing</span> <span class=\\\"mcp-hint\\\">runtimeHintPython</span></li><li><span class=\\\"mcp-mono\\\">docker</span> <span class=\\\"mcp-tag\\\" data-tone=\\\"warn\\\">runtimeMissing</span> <span class=\\\"mcp-hint\\\">runtimeHintDocker</span></li></ul></div></section><div id=\\\"mcp-tabpanel-catalog\\\" role=\\\"tabpanel\\\" aria-labelledby=\\\"mcp-tab-catalog\\\"><div class=\\\"mcp-stack\\\"><div class=\\\"mcp-row\\\"><div class=\\\"mcp-grow\\\"><label class=\\\"mcp-label\\\" for=\\\"mcp-catalog-search\\\">catalogSearchLabel</label><input id=\\\"mcp-catalog-search\\\" class=\\\"mcp-input\\\" type=\\\"search\\\" placeholder=\\\"catalogSearchPlaceholder\\\" value=\\\"\\\"></div><div><label class=\\\"mcp-label\\\" for=\\\"mcp-catalog-source\\\">catalogAllSources</label><select id=\\\"mcp-catalog-source\\\" class=\\\"mcp-select\\\"><option value=\\\"all\\\">catalogAllSources</option><option value=\\\"curated\\\">catalogSourceCurated</option><option value=\\\"registry\\\">catalogSourceRegistry</option></select></div><button type=\\\"button\\\" class=\\\"mcp-btn\\\" data-variant=\\\"secondary\\\" data-busy=\\\"false\\\" data-icon-only=\\\"false\\\"><span>refresh</span></button></div><div class=\\\"mcp-state\\\" data-tone=\\\"empty\\\" role=\\\"status\\\" aria-live=\\\"polite\\\"><p class=\\\"mcp-state-title\\\">catalogEmptyTitle</p><p class=\\\"mcp-state-body\\\">catalogEmptyBody</p></div></div></div></div></div></div>\"\n  }\n}",
+  "panels": {
+    "stable-locale (real LocaleRuntime contract)": {
+      "label": "stable-locale (real LocaleRuntime contract)",
+      "props": [
+        "t",
+        "controller",
+        "locale"
+      ],
+      "error": null,
+      "html": "<div class=\"mcp-studio\" dir=\"rtl\" lang=\"fa\"><header class=\"mcp-header\"><div class=\"mcp-header-top\"><div class=\"mcp-header-titles\"><h1>استودیوی MCP</h1><p class=\"mcp-subtitle\">سرورهای MCP را ببین، نصب کن، وصل شو و مدیریت کن — بدون دست‌زدن به YAML.</p></div><div class=\"mcp-header-actions\"><button type=\"button\" class=\"mcp-btn\" data-variant=\"secondary\" data-busy=\"false\" data-icon-only=\"false\"><span>برون‌ریزی patch</span></button><button type=\"button\" class=\"mcp-btn\" data-variant=\"secondary\" data-busy=\"false\" data-icon-only=\"false\"><span>تازه‌سازی</span></button></div></div><div class=\"mcp-tabs\" role=\"tablist\" aria-label=\"استودیوی MCP\"><button type=\"button\" role=\"tab\" id=\"mcp-tab-catalog\" class=\"mcp-tab\" aria-selected=\"true\" aria-controls=\"mcp-tabpanel-catalog\" tabindex=\"0\">کاتالوگ</button><button type=\"button\" role=\"tab\" id=\"mcp-tab-installed\" class=\"mcp-tab\" aria-selected=\"false\" aria-controls=\"mcp-tabpanel-installed\" tabindex=\"-1\">نصب‌شده‌ها</button></div></header><div class=\"mcp-body\"><div class=\"mcp-stack\"><section class=\"mcp-card\" aria-label=\"زمان‌های اجرای محلی\"><div class=\"mcp-card-head\"><div class=\"mcp-card-main\"><span class=\"mcp-card-title\">8 زمان اجرا پیدا نشد</span><span class=\"mcp-hint\">سرورهایی که به زمان اجرای غایب نیاز دارند بالا نمی‌آیند. با فرمانی که نشان داده شده نصبش کن و بعد تازه‌سازی کن.</span></div></div><div class=\"mcp-card-body\"><ul class=\"mcp-stack\" style=\"gap: 4px; margin: 0px; padding-inline-start: 18px;\"><li><span class=\"mcp-mono\">node</span> <span class=\"mcp-tag\" data-tone=\"warn\">غایب</span> <span class=\"mcp-hint\">Node.js را از nodejs.org نصب کن، یا بزن: winget install OpenJS.NodeJS.LTS</span></li><li><span class=\"mcp-mono\">npx</span> <span class=\"mcp-tag\" data-tone=\"warn\">غایب</span> <span class=\"mcp-hint\">بزن: npm install -g npm (npx همراه npm 5.2+ می‌آید)</span></li><li><span class=\"mcp-mono\">npm</span> <span class=\"mcp-tag\" data-tone=\"warn\">غایب</span> <span class=\"mcp-hint\">Node.js را از nodejs.org نصب کن</span></li><li><span class=\"mcp-mono\">pnpm</span> <span class=\"mcp-tag\" data-tone=\"warn\">غایب</span> <span class=\"mcp-hint\">بزن: corepack enable pnpm</span></li><li><span class=\"mcp-mono\">bunx</span> <span class=\"mcp-tag\" data-tone=\"warn\">غایب</span> <span class=\"mcp-hint\">Bun را از bun.sh نصب کن</span></li><li><span class=\"mcp-mono\">uvx</span> <span class=\"mcp-tag\" data-tone=\"warn\">غایب</span> <span class=\"mcp-hint\">بزن: pip install uv (یا: winget install astral-sh.uv)</span></li><li><span class=\"mcp-mono\">python</span> <span class=\"mcp-tag\" data-tone=\"warn\">غایب</span> <span class=\"mcp-hint\">Python 3 را از python.org نصب کن</span></li><li><span class=\"mcp-mono\">docker</span> <span class=\"mcp-tag\" data-tone=\"warn\">غایب</span> <span class=\"mcp-hint\">Docker Desktop را از docker.com نصب کن</span></li></ul></div></section><div id=\"mcp-tabpanel-catalog\" role=\"tabpanel\" aria-labelledby=\"mcp-tab-catalog\"><div class=\"mcp-stack\"><div class=\"mcp-row\"><div class=\"mcp-grow\"><label class=\"mcp-label\" for=\"mcp-catalog-search\">جست‌وجو در کاتالوگ</label><input id=\"mcp-catalog-search\" class=\"mcp-input\" type=\"search\" placeholder=\"جست‌وجو بر پایهٔ نام، سازنده یا برچسب…\" value=\"\"></div><div><label class=\"mcp-label\" for=\"mcp-catalog-source\">همهٔ منابع</label><select id=\"mcp-catalog-source\" class=\"mcp-select\"><option value=\"all\">همهٔ منابع</option><option value=\"curated\">همراه افزونه</option><option value=\"registry\">رجیستری</option></select></div><button type=\"button\" class=\"mcp-btn\" data-variant=\"secondary\" data-busy=\"false\" data-icon-only=\"false\"><span>تازه‌سازی</span></button></div><div class=\"mcp-state\" data-tone=\"empty\" role=\"status\" aria-live=\"polite\"><p class=\"mcp-state-title\">کاتالوگ خالی است</p><p class=\"mcp-state-body\">هیچ سروری برای نصب پیدا نشد. رجیستری را در پیکربندی افزونه روشن کن یا سرور را دستی بیفزای.</p></div></div></div></div></div></div>",
+      "unmounted": false,
+      "fetchCalls": [
+        {
+          "method": "listServers",
+          "valueType": "array(0)"
+        },
+        {
+          "method": "catalog",
+          "valueType": "object"
+        },
+        {
+          "method": "detectRuntimes",
+          "valueType": "object"
+        },
+        {
+          "method": "listSecretNames",
+          "valueType": "array(0)"
+        },
+        {
+          "method": "catalogCategories",
+          "valueType": "array(0)"
+        }
+      ],
+      "probe": {
+        "snapshotKeys": [
+          "visible",
+          "tab",
+          "servers",
+          "catalog",
+          "catalogQuery",
+          "categories",
+          "runtimes",
+          "secrets",
+          "selection",
+          "drawerTab",
+          "detail",
+          "logs",
+          "logsPhase",
+          "probe",
+          "patch",
+          "busy",
+          "actionErrors"
+        ],
+        "hasCategories": true,
+        "categoriesType": "array(0)",
+        "catalogKeys": [
+          "phase",
+          "value",
+          "total",
+          "registryOnline"
+        ],
+        "catalogValueIsArray": true,
+        "catalogPhase": "idle",
+        "runtimesPhase": "idle",
+        "tIsFunction": "function",
+        "localeHasSnapshot": "function"
+      },
+      "snapshotLog": [
+        {
+          "categories": "array(0)",
+          "catalogPhase": "idle",
+          "catalogValue": "array(0)",
+          "tab": "catalog"
+        },
+        {
+          "categories": "array(0)",
+          "catalogPhase": "idle",
+          "catalogValue": "array(0)",
+          "tab": "catalog"
+        },
+        {
+          "categories": "array(0)",
+          "catalogPhase": "loading",
+          "catalogValue": "array(0)",
+          "tab": "catalog"
+        },
+        {
+          "categories": "array(0)",
+          "catalogPhase": "loading",
+          "catalogValue": "array(0)",
+          "tab": "catalog"
+        },
+        {
+          "categories": "array(0)",
+          "catalogPhase": "loading",
+          "catalogValue": "array(0)",
+          "tab": "catalog"
+        },
+        {
+          "categories": "array(0)",
+          "catalogPhase": "loading",
+          "catalogValue": "array(0)",
+          "tab": "catalog"
+        },
+        {
+          "categories": "array(0)",
+          "catalogPhase": "loading",
+          "catalogValue": "array(0)",
+          "tab": "catalog"
+        },
+        {
+          "categories": "array(0)",
+          "catalogPhase": "ready",
+          "catalogValue": "array(0)",
+          "tab": "catalog"
+        },
+        {
+          "categories": "array(0)",
+          "catalogPhase": "ready",
+          "catalogValue": "array(0)",
+          "tab": "catalog"
+        },
+        {
+          "categories": "array(0)",
+          "catalogPhase": "ready",
+          "catalogValue": "array(0)",
+          "tab": "catalog"
+        },
+        {
+          "categories": "array(0)",
+          "catalogPhase": "ready",
+          "catalogValue": "array(0)",
+          "tab": "catalog"
+        }
+      ],
+      "apiLog": [
+        {
+          "call": "catalogCategories",
+          "resolvedType": "array(0)",
+          "stack": "Error: catalogCategories resolved here\n    at api.catalogCategories (file:///F:/harness/dsh-mcp-studio/tests/e2e/blank-panel-repro.mjs:395:20)\n    at async McpStudioController.loadCategories (F:\\harness\\dsh-mcp-studio\\lib\\client.js:1193:35)"
+        }
+      ]
+    },
+    "fresh-object-locale (tests/client/render.test.tsx:22)": {
+      "label": "fresh-object-locale (tests/client/render.test.tsx:22)",
+      "props": [
+        "t",
+        "controller",
+        "locale"
+      ],
+      "error": null,
+      "html": "<div class=\"mcp-studio\" dir=\"rtl\" lang=\"fa\"><header class=\"mcp-header\"><div class=\"mcp-header-top\"><div class=\"mcp-header-titles\"><h1>title</h1><p class=\"mcp-subtitle\">subtitle</p></div><div class=\"mcp-header-actions\"><button type=\"button\" class=\"mcp-btn\" data-variant=\"secondary\" data-busy=\"false\" data-icon-only=\"false\"><span>exportPatch</span></button><button type=\"button\" class=\"mcp-btn\" data-variant=\"secondary\" data-busy=\"false\" data-icon-only=\"false\"><span>refresh</span></button></div></div><div class=\"mcp-tabs\" role=\"tablist\" aria-label=\"title\"><button type=\"button\" role=\"tab\" id=\"mcp-tab-catalog\" class=\"mcp-tab\" aria-selected=\"true\" aria-controls=\"mcp-tabpanel-catalog\" tabindex=\"0\">tabCatalog</button><button type=\"button\" role=\"tab\" id=\"mcp-tab-installed\" class=\"mcp-tab\" aria-selected=\"false\" aria-controls=\"mcp-tabpanel-installed\" tabindex=\"-1\">tabInstalled</button></div></header><div class=\"mcp-body\"><div class=\"mcp-stack\"><section class=\"mcp-card\" aria-label=\"runtimeTitle\"><div class=\"mcp-card-head\"><div class=\"mcp-card-main\"><span class=\"mcp-card-title\">runtimeMissingTitle</span><span class=\"mcp-hint\">runtimeMissingBody</span></div></div><div class=\"mcp-card-body\"><ul class=\"mcp-stack\" style=\"gap: 4px; margin: 0px; padding-inline-start: 18px;\"><li><span class=\"mcp-mono\">node</span> <span class=\"mcp-tag\" data-tone=\"warn\">runtimeMissing</span> <span class=\"mcp-hint\">runtimeHintNode</span></li><li><span class=\"mcp-mono\">npx</span> <span class=\"mcp-tag\" data-tone=\"warn\">runtimeMissing</span> <span class=\"mcp-hint\">runtimeHintNpx</span></li><li><span class=\"mcp-mono\">npm</span> <span class=\"mcp-tag\" data-tone=\"warn\">runtimeMissing</span> <span class=\"mcp-hint\">runtimeHintNpm</span></li><li><span class=\"mcp-mono\">pnpm</span> <span class=\"mcp-tag\" data-tone=\"warn\">runtimeMissing</span> <span class=\"mcp-hint\">runtimeHintPnpm</span></li><li><span class=\"mcp-mono\">bunx</span> <span class=\"mcp-tag\" data-tone=\"warn\">runtimeMissing</span> <span class=\"mcp-hint\">runtimeHintBunx</span></li><li><span class=\"mcp-mono\">uvx</span> <span class=\"mcp-tag\" data-tone=\"warn\">runtimeMissing</span> <span class=\"mcp-hint\">runtimeHintUvx</span></li><li><span class=\"mcp-mono\">python</span> <span class=\"mcp-tag\" data-tone=\"warn\">runtimeMissing</span> <span class=\"mcp-hint\">runtimeHintPython</span></li><li><span class=\"mcp-mono\">docker</span> <span class=\"mcp-tag\" data-tone=\"warn\">runtimeMissing</span> <span class=\"mcp-hint\">runtimeHintDocker</span></li></ul></div></section><div id=\"mcp-tabpanel-catalog\" role=\"tabpanel\" aria-labelledby=\"mcp-tab-catalog\"><div class=\"mcp-stack\"><div class=\"mcp-row\"><div class=\"mcp-grow\"><label class=\"mcp-label\" for=\"mcp-catalog-search\">catalogSearchLabel</label><input id=\"mcp-catalog-search\" class=\"mcp-input\" type=\"search\" placeholder=\"catalogSearchPlaceholder\" value=\"\"></div><div><label class=\"mcp-label\" for=\"mcp-catalog-source\">catalogAllSources</label><select id=\"mcp-catalog-source\" class=\"mcp-select\"><option value=\"all\">catalogAllSources</option><option value=\"curated\">catalogSourceCurated</option><option value=\"registry\">catalogSourceRegistry</option></select></div><button type=\"button\" class=\"mcp-btn\" data-variant=\"secondary\" data-busy=\"false\" data-icon-only=\"false\"><span>refresh</span></button></div><div class=\"mcp-state\" data-tone=\"empty\" role=\"status\" aria-live=\"polite\"><p class=\"mcp-state-title\">catalogEmptyTitle</p><p class=\"mcp-state-body\">catalogEmptyBody</p></div></div></div></div></div></div>",
+      "unmounted": false,
+      "fetchCalls": [
+        {
+          "method": "listServers",
+          "valueType": "array(0)"
+        },
+        {
+          "method": "catalog",
+          "valueType": "object"
+        },
+        {
+          "method": "detectRuntimes",
+          "valueType": "object"
+        },
+        {
+          "method": "listSecretNames",
+          "valueType": "array(0)"
+        },
+        {
+          "method": "catalogCategories",
+          "valueType": "array(0)"
+        },
+        {
+          "method": "listServers",
+          "valueType": "array(0)"
+        },
+        {
+          "method": "catalog",
+          "valueType": "object"
+        },
+        {
+          "method": "detectRuntimes",
+          "valueType": "object"
+        },
+        {
+          "method": "listSecretNames",
+          "valueType": "array(0)"
+        },
+        {
+          "method": "catalogCategories",
+          "valueType": "array(0)"
+        }
+      ],
+      "probe": {
+        "snapshotKeys": [
+          "visible",
+          "tab",
+          "servers",
+          "catalog",
+          "catalogQuery",
+          "categories",
+          "runtimes",
+          "secrets",
+          "selection",
+          "drawerTab",
+          "detail",
+          "logs",
+          "logsPhase",
+          "probe",
+          "patch",
+          "busy",
+          "actionErrors"
+        ],
+        "hasCategories": true,
+        "categoriesType": "array(0)",
+        "catalogKeys": [
+          "phase",
+          "value",
+          "total",
+          "registryOnline"
+        ],
+        "catalogValueIsArray": true,
+        "catalogPhase": "idle",
+        "runtimesPhase": "idle",
+        "tIsFunction": "function",
+        "localeHasSnapshot": "function"
+      },
+      "snapshotLog": [
+        {
+          "categories": "array(0)",
+          "catalogPhase": "idle",
+          "catalogValue": "array(0)",
+          "tab": "catalog"
+        },
+        {
+          "categories": "array(0)",
+          "catalogPhase": "idle",
+          "catalogValue": "array(0)",
+          "tab": "catalog"
+        },
+        {
+          "categories": "array(0)",
+          "catalogPhase": "loading",
+          "catalogValue": "array(0)",
+          "tab": "catalog"
+        },
+        {
+          "categories": "array(0)",
+          "catalogPhase": "loading",
+          "catalogValue": "array(0)",
+          "tab": "catalog"
+        },
+        {
+          "categories": "array(0)",
+          "catalogPhase": "loading",
+          "catalogValue": "array(0)",
+          "tab": "catalog"
+        },
+        {
+          "categories": "array(0)",
+          "catalogPhase": "loading",
+          "catalogValue": "array(0)",
+          "tab": "catalog"
+        },
+        {
+          "categories": "array(0)",
+          "catalogPhase": "loading",
+          "catalogValue": "array(0)",
+          "tab": "catalog"
+        },
+        {
+          "categories": "array(0)",
+          "catalogPhase": "ready",
+          "catalogValue": "array(0)",
+          "tab": "catalog"
+        },
+        {
+          "categories": "array(0)",
+          "catalogPhase": "ready",
+          "catalogValue": "array(0)",
+          "tab": "catalog"
+        },
+        {
+          "categories": "array(0)",
+          "catalogPhase": "ready",
+          "catalogValue": "array(0)",
+          "tab": "catalog"
+        },
+        {
+          "categories": "array(0)",
+          "catalogPhase": "ready",
+          "catalogValue": "array(0)",
+          "tab": "catalog"
+        }
+      ],
+      "apiLog": [
+        {
+          "call": "catalogCategories",
+          "resolvedType": "array(0)",
+          "stack": "Error: catalogCategories resolved here\n    at api.catalogCategories (file:///F:/harness/dsh-mcp-studio/tests/e2e/blank-panel-repro.mjs:395:20)\n    at async McpStudioController.loadCategories (F:\\harness\\dsh-mcp-studio\\lib\\client.js:1193:35)"
+        }
+      ]
+    }
+  },
+  "windowErrors": []
+}

@@ -30,6 +30,12 @@ const ctx = new Context()
 const registered = new Map()
 ctx.provide('tools', {
   register(definition) {
+    // Faithful to the real ToolRuntime: a second registration of a live name
+    // throws. Without this the fake would silently accept a namespace collision
+    // and the connect-time error path could never be exercised.
+    if (registered.has(definition.name)) {
+      throw new Error(`tool "${definition.name}" is already registered`)
+    }
     registered.set(definition.name, definition)
     return () => registered.delete(definition.name)
   },
@@ -250,6 +256,57 @@ check(
   badTransport.body.ok === false && badTransport.body.error?.code === 'invalid-transport',
   JSON.stringify(badTransport.body).slice(0, 160),
 )
+
+// Foreign namespace: a server this plugin does NOT manage — typically a row in
+// the profile's cordis.patch.yml — already owns the tool namespace. The bridge
+// would reject the mount with an opaque "already registered"; we must say it
+// plainly, before spawning anything.
+registered.set('mcp__ghost__steal', { name: 'mcp__ghost__steal' })
+const ghost = await rpc('addServer', {
+  transport: 'stdio',
+  title: 'Ghost',
+  serverName: 'ghost',
+  command: 'npx',
+  args: ['-y', 'a-package-that-does-not-exist'],
+})
+check(
+  'a namespace owned by a non-managed server is refused with namespace-in-use',
+  ghost.body.ok === false && ghost.body.error?.code === 'namespace-in-use',
+  JSON.stringify(ghost.body).slice(0, 200),
+)
+check(
+  'the refusal names the namespace and points at the patch file',
+  typeof ghost.body.error?.message === 'string' &&
+    ghost.body.error.message.includes('mcp__ghost__*') &&
+    ghost.body.error.message.includes('cordis.patch.yml'),
+  ghost.body.error?.message ?? '',
+)
+registered.delete('mcp__ghost__steal')
+
+// The connect-time path has to explain the same collision: a restart bypasses
+// the service's pre-flight guard, so the supervisor's own error mapping is what
+// the user sees. Simulate a foreign owner appearing while our server is off.
+const rt = await rpc('addServer', {
+  transport: 'stdio',
+  title: 'Restart Target',
+  serverName: 'rt',
+  command: 'npx',
+  args: ['-y', '@modelcontextprotocol/server-memory@2026.7.4'],
+  env: { MEMORY_FILE_PATH: join(storeDir, 'rt.jsonl') },
+})
+check('a second real server connects', rt.body.value?.status === 'connected', rt.body.value?.lastError ?? '')
+await rpc('setEnabled', 'rt', false)
+registered.set('mcp__rt__create_entities', { name: 'mcp__rt__create_entities' })
+const rtRestart = await rpc('setEnabled', 'rt', true)
+check(
+  'a connect-time namespace collision is explained, not raw',
+  rtRestart.body.value?.status === 'error' &&
+    typeof rtRestart.body.value?.lastError === 'string' &&
+    rtRestart.body.value.lastError.includes('already provided by another MCP server'),
+  rtRestart.body.value?.lastError ?? '',
+)
+registered.delete('mcp__rt__create_entities')
+await rpc('removeServer', 'rt')
 
 // --- removal -----------------------------------------------------------------
 const removed = await rpc('removeServer', memory?.id)

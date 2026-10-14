@@ -14,6 +14,7 @@
  * @module @mfallah/dsh-mcp-studio/client
  */
 import { LOCALE_NS, PANEL_ID } from '../shared/contract.js'
+import { createStudioFace } from './face.js'
 import { en } from './locales/en.js'
 import { fa } from './locales/fa.js'
 import { McpStudioIcon } from './panel/McpStudioIcon.js'
@@ -47,7 +48,11 @@ export function apply(ctx: any): void {
   const controller = new McpStudioController({ api: createStudioApi() })
   ctx.effect(() => () => controller.dispose(), 'mcp-studio: controller')
 
-  const face = { controller, locale: ctx.locale }
+  // The locale service goes through `createStudioFace`: its `subscribe` and
+  // `getSnapshot` are `this`-dependent prototype methods, and React calls
+  // `subscribe` detached. Passing `ctx.locale` directly threw on first render
+  // and left the panel blank.
+  const face = createStudioFace({ controller, locale: ctx.locale })
 
   ctx.slots.inject('main', function* () {
     yield ctx.slots.register(

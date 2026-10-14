@@ -16,6 +16,7 @@ const CODE_COPY: Record<NonNullable<ProbeResult['code']>, LocaleKey> = {
   'handshake-failed': 'probeCodeHandshakeFailed',
   timeout: 'probeCodeTimeout',
   'invalid-config': 'probeCodeInvalidConfig',
+  'namespace-in-use': 'probeCodeNamespaceInUse',
 }
 
 /** How many tool names to spell out before switching to a count. */

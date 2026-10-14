@@ -217,6 +217,12 @@ export function entryToDraft(entry: CatalogEntry, values: Record<string, string>
     title: entry.title,
     ...(entry.description ? { description: entry.description } : {}),
     serverName: slugifyServerName(entry.slug || entry.title),
+    // Carry the provenance across the boundary, so an entry installed from the
+    // catalog still reads as a catalog entry in the panel instead of looking
+    // hand-written. `addServer` persists these onto the row.
+    source: entry.source === 'registry' ? 'registry' : 'curated',
+    catalogId: entry.id,
+    ...(entry.homepage ? { homepage: entry.homepage } : {}),
     failOnStartupError: false,
     toolCallTimeoutMs: DEFAULT_TOOL_CALL_TIMEOUT_MS,
   }

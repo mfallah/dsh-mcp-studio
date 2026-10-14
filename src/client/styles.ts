@@ -1,11 +1,23 @@
 /**
  * The panel's stylesheet, as one injected `<style>` element.
  *
- * Everything is scoped under `.mcp-studio` and every colour reads a `--dsw-*`
- * token first, with a dark-theme fallback, so the panel looks native in the
- * harness and still renders standalone in tests. Logical properties
- * (`margin-inline`, `padding-inline`, `inset-inline`) keep the layout correct
- * in both directions, since the panel flips to RTL for Persian.
+ * Everything is scoped under `.mcp-studio`. Colours, radii, elevation and the
+ * focus ring read the harness's real custom properties — every name in the
+ * `--mcp-*` alias block below resolves to a token the theme package defines on
+ * `body` (see `theme-tokens.ts`, and the audit in
+ * `tests/client/theme-tokens.test.ts`).
+ *
+ * Two rules this file lives by, because breaking them is how the panel once
+ * rendered dark in light mode:
+ *
+ *  1. No colour literals and no dark fallbacks. A misspelled token must inherit
+ *     from the harness and be caught by the audit, never silently force a theme.
+ *  2. The alias block is the only place a `.mcp-*` variable is bound to a
+ *     `--dsw-*` token; components reference `var(--mcp-*)` only.
+ *
+ * Logical properties (`margin-inline`, `padding-inline`, `inset-inline`) keep
+ * the layout correct in both directions, since the panel flips to RTL for
+ * Persian.
  *
  * @module @mfallah/dsh-mcp-studio/client/styles
  */
@@ -16,21 +28,50 @@ const STYLE_ATTR = 'data-mcp-studio-styles'
 /** The complete stylesheet. */
 export const STUDIO_CSS = `
 .mcp-studio {
-  --mcp-bg: var(--dsw-surface-base, #14161a);
-  --mcp-raised: var(--dsw-surface-raised, #1b1e24);
-  --mcp-sunken: var(--dsw-surface-sunken, #101216);
-  --mcp-border: var(--dsw-border-subtle, #2a2f37);
-  --mcp-border-strong: var(--dsw-border-default, #3a414c);
-  --mcp-text: var(--dsw-text-primary, #e6e8ec);
-  --mcp-muted: var(--dsw-text-secondary, #9aa2ad);
-  --mcp-faint: var(--dsw-text-tertiary, #6d7580);
-  --mcp-accent: var(--dsw-accent, #4c8dff);
-  --mcp-accent-soft: color-mix(in srgb, var(--mcp-accent) 18%, transparent);
-  --mcp-ok: var(--dsw-status-success, #35c07a);
-  --mcp-warn: var(--dsw-status-warning, #e2b23c);
-  --mcp-error: var(--dsw-status-danger, #e5534b);
-  --mcp-radius: 10px;
-  --mcp-radius-sm: 6px;
+  /* Surfaces */
+  --mcp-bg: var(--dsw-alias-bg-base);
+  --mcp-raised: var(--dsw-alias-bg-layer-1);
+  --mcp-sunken: var(--dsw-alias-bg-layer-2);
+  --mcp-raised-high: var(--dsw-alias-bg-layer-3);
+  /* Borders */
+  --mcp-border: var(--dsw-alias-border-l1);
+  --mcp-border-strong: var(--dsw-alias-border-l2);
+  --mcp-border-focus-adjacent: var(--dsw-alias-border-l3);
+  /* Text */
+  --mcp-text: var(--dsw-alias-label-primary);
+  --mcp-muted: var(--dsw-alias-label-secondary);
+  --mcp-faint: var(--dsw-alias-label-tertiary);
+  --mcp-on-accent: var(--dsw-alias-label-primary-foreground);
+  /* Interactive */
+  --mcp-accent: var(--dsw-alias-state-business-primary);
+  --mcp-accent-soft: color-mix(in srgb, var(--dsw-alias-state-business-primary) 18%, transparent);
+  --mcp-hover: var(--dsw-alias-interactive-bg-hover);
+  --mcp-primary-fill: var(--dsw-alias-button-primary-fill);
+  --mcp-primary-hover: var(--dsw-alias-button-primary-hover);
+  --mcp-ghost-active: var(--dsw-alias-button-ghost-active-fill);
+  /* Status */
+  --mcp-ok: var(--dsw-alias-state-success-primary);
+  --mcp-warn: var(--dsw-alias-state-warn-primary);
+  --mcp-error: var(--dsw-alias-state-error-primary);
+  /* Wells, overlay, focus */
+  --mcp-code-bg: var(--dsw-alias-markdown-code-block);
+  --mcp-scrim: var(--dsw-alias-bg-mask-1);
+  /*
+   * The focus ring colour is deliberately NOT aliased here. The harness sets
+   * --dsw-focus-ring-color to transparent on the focused element itself under
+   * html[data-input-modality=pointer]; a value captured by an ancestor rule
+   * would compute once on .mcp-studio and defeat that suppression. Resolving it
+   * inside the :focus-visible rule keeps pointer vs keyboard rings exactly as
+   * the harness intends.
+   */
+  --mcp-focus-ring-width: var(--dsw-focus-ring-width);
+  /* Geometry and type: these fall back to plain CSS values, not to a theme. */
+  --mcp-radius: var(--dsw-radius-md, 10px);
+  --mcp-radius-sm: var(--dsw-radius-sm, 6px);
+  --mcp-radius-panel: var(--dsw-radius-panel, 12px);
+  --mcp-shadow: var(--dsw-shadow-lv2);
+  --mcp-elevation: var(--dsw-elevation-panel);
+  --mcp-blur: var(--dsw-mask-blur);
   --mcp-gap: 12px;
   box-sizing: border-box;
   display: flex;
@@ -39,15 +80,15 @@ export const STUDIO_CSS = `
   min-height: 0;
   background: var(--mcp-bg);
   color: var(--mcp-text);
-  font-family: Vazirmatn, 'Vazirmatn Variable', -apple-system, 'Segoe UI', system-ui, sans-serif;
+  font-family: Vazirmatn, 'Vazirmatn Variable', var(--dsw-font-family, system-ui, sans-serif);
   font-size: 13.5px;
   line-height: 1.65;
 }
 .mcp-studio *, .mcp-studio *::before, .mcp-studio *::after { box-sizing: border-box; }
 .mcp-studio :focus-visible {
-  outline: 2px solid var(--mcp-accent);
+  outline: var(--mcp-focus-ring-width) solid var(--dsw-focus-ring-color, var(--dsw-alias-state-business-primary));
   outline-offset: 2px;
-  border-radius: 4px;
+  border-radius: var(--mcp-radius-sm);
 }
 .mcp-studio h1 { font-size: 1.25rem; margin: 0; font-weight: 650; }
 .mcp-studio h2 { font-size: 1rem; margin: 0; font-weight: 600; }
@@ -96,13 +137,26 @@ export const STUDIO_CSS = `
   cursor: pointer;
   transition: background 120ms ease, border-color 120ms ease;
 }
-.mcp-btn:hover:not(:disabled) { border-color: var(--mcp-accent); }
+.mcp-btn:hover:not(:disabled) { background: var(--mcp-hover); border-color: var(--mcp-border-focus-adjacent); }
+.mcp-btn:active:not(:disabled) { background: var(--mcp-ghost-active); }
 .mcp-btn:disabled { opacity: 0.55; cursor: not-allowed; }
-.mcp-btn[data-variant='primary'] { background: var(--mcp-accent); border-color: var(--mcp-accent); color: #fff; }
+.mcp-btn[data-variant='primary'] {
+  background: var(--mcp-primary-fill);
+  border-color: var(--mcp-primary-fill);
+  color: var(--mcp-on-accent);
+}
+.mcp-btn[data-variant='primary']:hover:not(:disabled) {
+  background: var(--mcp-primary-hover);
+  border-color: var(--mcp-primary-hover);
+}
 .mcp-btn[data-variant='ghost'] { background: transparent; border-color: transparent; color: var(--mcp-muted); }
-.mcp-btn[data-variant='ghost']:hover:not(:disabled) { background: var(--mcp-sunken); color: var(--mcp-text); }
-.mcp-btn[data-variant='danger'] { border-color: var(--mcp-error); color: var(--mcp-error); background: transparent; }
-.mcp-btn[data-variant='danger']:hover:not(:disabled) { background: color-mix(in srgb, var(--mcp-error) 14%, transparent); }
+.mcp-btn[data-variant='ghost']:hover:not(:disabled) { background: var(--mcp-hover); color: var(--mcp-text); }
+.mcp-btn[data-variant='danger'] {
+  border-color: var(--mcp-error);
+  color: var(--mcp-error);
+  background: transparent;
+}
+.mcp-btn[data-variant='danger']:hover:not(:disabled) { background: var(--dsw-alias-interactive-bg-hover-danger); }
 .mcp-btn[data-icon-only='true'] { padding: 5px 7px; }
 .mcp-btn[data-busy='true'] { cursor: progress; }
 
@@ -116,6 +170,7 @@ export const STUDIO_CSS = `
   font: inherit;
   cursor: pointer;
 }
+.mcp-tab:hover { color: var(--mcp-text); background: var(--mcp-hover); }
 .mcp-tab[aria-selected='true'] { color: var(--mcp-text); border-bottom-color: var(--mcp-accent); }
 
 /* Tags / badges ----------------------------------------------------------- */
@@ -130,10 +185,22 @@ export const STUDIO_CSS = `
   color: var(--mcp-muted);
   white-space: nowrap;
 }
-.mcp-tag[data-tone='ok'] { color: var(--mcp-ok); border-color: color-mix(in srgb, var(--mcp-ok) 45%, var(--mcp-border)); }
-.mcp-tag[data-tone='warn'] { color: var(--mcp-warn); border-color: color-mix(in srgb, var(--mcp-warn) 45%, var(--mcp-border)); }
-.mcp-tag[data-tone='error'] { color: var(--mcp-error); border-color: color-mix(in srgb, var(--mcp-error) 45%, var(--mcp-border)); }
-.mcp-tag[data-tone='info'] { color: var(--mcp-accent); border-color: color-mix(in srgb, var(--mcp-accent) 45%, var(--mcp-border)); }
+.mcp-tag[data-tone='ok'] {
+  color: var(--mcp-ok);
+  border-color: color-mix(in srgb, var(--dsw-alias-state-success-primary) 45%, var(--mcp-border));
+}
+.mcp-tag[data-tone='warn'] {
+  color: var(--mcp-warn);
+  border-color: color-mix(in srgb, var(--dsw-alias-state-warn-primary) 45%, var(--mcp-border));
+}
+.mcp-tag[data-tone='error'] {
+  color: var(--mcp-error);
+  border-color: color-mix(in srgb, var(--dsw-alias-state-error-primary) 45%, var(--mcp-border));
+}
+.mcp-tag[data-tone='info'] {
+  color: var(--mcp-accent);
+  border-color: color-mix(in srgb, var(--dsw-alias-state-business-primary) 45%, var(--mcp-border));
+}
 
 /* Status ------------------------------------------------------------------ */
 .mcp-status { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
@@ -169,7 +236,9 @@ export const STUDIO_CSS = `
   gap: 6px;
   align-items: flex-start;
 }
-.mcp-state[data-tone='error'] { border-color: color-mix(in srgb, var(--mcp-error) 55%, var(--mcp-border)); }
+.mcp-state[data-tone='error'] {
+  border-color: color-mix(in srgb, var(--dsw-alias-state-error-primary) 55%, var(--mcp-border));
+}
 .mcp-state[data-tone='offline'] { border-style: solid; }
 .mcp-state-title { font-weight: 600; }
 .mcp-state-body { color: var(--mcp-muted); margin: 0; max-width: 68ch; }
@@ -186,6 +255,7 @@ export const STUDIO_CSS = `
   padding: 6px 9px;
   font: inherit;
 }
+.mcp-input:hover, .mcp-select:hover, .mcp-textarea:hover { border-color: var(--mcp-border-focus-adjacent); }
 .mcp-textarea { min-height: 84px; resize: vertical; font-family: 'Cascadia Mono', ui-monospace, monospace; }
 .mcp-input:disabled, .mcp-select:disabled { opacity: 0.6; }
 .mcp-hint { font-size: 0.8em; color: var(--mcp-faint); margin: 0; }
@@ -202,7 +272,8 @@ export const STUDIO_CSS = `
 .mcp-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(4, 6, 9, 0.6);
+  background: var(--mcp-scrim);
+  backdrop-filter: var(--mcp-blur);
   display: flex;
   justify-content: center;
   align-items: stretch;
@@ -210,15 +281,15 @@ export const STUDIO_CSS = `
   z-index: 40;
 }
 .mcp-sheet {
-  background: var(--mcp-bg);
+  background: var(--mcp-raised-high);
   border: 1px solid var(--mcp-border-strong);
-  border-radius: var(--mcp-radius);
+  border-radius: var(--mcp-radius-panel);
   width: min(720px, 100%);
   max-height: 100%;
   display: flex;
   flex-direction: column;
   min-height: 0;
-  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
+  box-shadow: var(--mcp-elevation);
 }
 .mcp-sheet[data-wide='true'] { width: min(960px, 100%); }
 .mcp-sheet-head {
@@ -241,7 +312,7 @@ export const STUDIO_CSS = `
 
 /* Logs -------------------------------------------------------------------- */
 .mcp-logs {
-  background: var(--mcp-sunken);
+  background: var(--mcp-code-bg);
   border: 1px solid var(--mcp-border);
   border-radius: var(--mcp-radius-sm);
   padding: 8px 10px;
@@ -261,7 +332,7 @@ export const STUDIO_CSS = `
 
 /* Code / patch ------------------------------------------------------------ */
 .mcp-code {
-  background: var(--mcp-sunken);
+  background: var(--mcp-code-bg);
   border: 1px solid var(--mcp-border);
   border-radius: var(--mcp-radius-sm);
   padding: 10px;
@@ -290,7 +361,12 @@ export const STUDIO_CSS = `
   font-size: 0.85em;
   cursor: pointer;
 }
-.mcp-chip[aria-pressed='true'] { background: var(--mcp-accent-soft); color: var(--mcp-text); border-color: var(--mcp-accent); }
+.mcp-chip:hover { background: var(--mcp-hover); color: var(--mcp-text); }
+.mcp-chip[aria-pressed='true'] {
+  background: var(--mcp-accent-soft);
+  color: var(--mcp-text);
+  border-color: var(--mcp-accent);
+}
 
 /* Screen-reader only ------------------------------------------------------ */
 .mcp-sr {

@@ -101,7 +101,7 @@ export function InstalledTab({
                         </span>
                       </span>
                       {server.lastError ? (
-                        <span className="mcp-inline-error">
+                        <span className="mcp-inline-error mcp-wrap">
                           {t('lastErrorLabel')}: {server.lastError}
                         </span>
                       ) : null}

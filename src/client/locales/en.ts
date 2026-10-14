@@ -91,6 +91,8 @@ export const en: Dictionary = {
     'The process started but the MCP handshake failed. This may not be an MCP server.',
   probeCodeTimeout: 'The server did not answer in time. It may be downloading packages, or hanging.',
   probeCodeInvalidConfig: 'The configuration is incomplete or invalid.',
+  probeCodeNamespaceInUse:
+    'This tool namespace is already owned by an MCP server outside this panel — choose a different server name.',
   installAction: 'Install',
   installing: 'Installing…',
   installFailed: 'Install failed',

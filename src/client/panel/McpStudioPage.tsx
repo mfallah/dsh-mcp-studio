@@ -4,7 +4,7 @@
  *
  * @module @mfallah/dsh-mcp-studio/client/panel/McpStudioPage
  */
-import { useEffect, useState, useSyncExternalStore } from 'react'
+import { useEffect, useMemo, useState, useSyncExternalStore } from 'react'
 import type { Translate } from '../locales/keys.js'
 import { busyKey, type McpStudioController, type StudioTab } from '../state.js'
 import { ensureStudioStyles } from '../styles.js'
@@ -35,14 +35,46 @@ export interface StudioPanelProps {
 
 const NO_SUBSCRIBE = () => () => undefined
 
-/** Resolve writing direction from the active locale; Persian and Arabic are RTL. */
+/** The store shape `useSyncExternalStore` accepts. */
+interface DirectionStore {
+  subscribe(listener: () => void): () => void
+  getSnapshot(): { active: string }
+}
+
+/**
+ * Resolve writing direction from the active locale; Persian and Arabic are RTL.
+ *
+ * The store is rebuilt only when `locale` itself changes, and its `subscribe`
+ * calls the service as a method rather than forwarding a detached reference.
+ * That second part is load-bearing: a locale service whose `subscribe` is a
+ * `this`-dependent prototype method throws the moment React calls it bare,
+ * which is how the blank-panel regression happened. Rebuilding the store on
+ * every render would instead resubscribe on every render, so it is memoised.
+ *
+ * @param locale - the locale face, or undefined when absent.
+ * @returns the direction to render in.
+ */
 function useDirection(locale: LocaleFace | undefined): 'rtl' | 'ltr' {
-  const active = useSyncExternalStore(
-    locale?.subscribe ?? NO_SUBSCRIBE,
-    () => locale?.getSnapshot().active ?? 'en',
+  const store = useMemo<DirectionStore | null>(
+    () =>
+      locale === undefined
+        ? null
+        : {
+            getSnapshot: () => locale.getSnapshot(),
+            subscribe: (listener: () => void) => locale.subscribe(listener),
+          },
+    [locale],
+  )
+  const active: unknown = useSyncExternalStore(
+    store?.subscribe ?? NO_SUBSCRIBE,
+    () => store?.getSnapshot().active ?? 'en',
     () => 'en',
   )
-  return active.startsWith('fa') || active.startsWith('ar') ? 'rtl' : 'ltr'
+  // A service that reports a non-string here must not take the whole app down
+  // with a `.startsWith` TypeError.
+  return typeof active === 'string' && (active.startsWith('fa') || active.startsWith('ar'))
+    ? 'rtl'
+    : 'ltr'
 }
 
 /**

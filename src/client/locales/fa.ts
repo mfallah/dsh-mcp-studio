@@ -88,6 +88,8 @@ export const fa: Dictionary = {
   probeCodeHandshakeFailed: 'فرایند بالا آمد اما دست‌دادن MCP شکست خورد. شاید این سرور MCP نباشد.',
   probeCodeTimeout: 'سرور به‌موقع پاسخ نداد. ممکن است در حال بارگیری بسته‌ها باشد یا گیر کرده باشد.',
   probeCodeInvalidConfig: 'پیکربندی ناقص یا نامعتبر است.',
+  probeCodeNamespaceInUse:
+    'این فضای‌نام ابزارها از قبل توسط یک سرور MCP خارج از این پنل اشغال شده است — نام سروری دیگر انتخاب کن.',
   installAction: 'نصب',
   installing: 'در حال نصب…',
   installFailed: 'نصب نشد',

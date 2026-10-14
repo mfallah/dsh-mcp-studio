@@ -326,7 +326,7 @@ export class ConnectionSupervisor {
       )
     } catch (error) {
       state.status = 'error'
-      state.lastError = errorMessage(error)
+      state.lastError = explainConnectFailure(errorMessage(error), config.serverName)
       state.tools = []
       this.logs.append(config.id, 'error', `connection failed: ${state.lastError}`)
       if (state.fiber !== null) {
@@ -439,6 +439,27 @@ export class ConnectionSupervisor {
     const ids = [...this.states.keys()]
     await Promise.all(ids.map((id) => this.serialize(id, () => this.unmountNow(id))))
   }
+}
+
+/**
+ * Turn a bridge failure into something a user can act on.
+ *
+ * The bridge reports a namespace collision as
+ * `tool "mcp__x__y" is already registered`, which is precise and useless: it
+ * never says that another MCP server — usually a row in the profile's
+ * `cordis.patch.yml` — already owns that namespace. This is the code path a
+ * *restart* and a startup mount take, where `McpStudioService`'s pre-flight
+ * guard does not run, so the explanation has to happen here too.
+ */
+function explainConnectFailure(message: string, serverName: string): string {
+  if (message.includes('is already registered')) {
+    return (
+      `the tool namespace "mcp__${serverName}__*" is already provided by another MCP server in this ` +
+      `harness (typically a row in the profile's cordis.patch.yml). Choose a different server name, ` +
+      `or remove that row. Original error: ${message}`
+    )
+  }
+  return message
 }
 
 /** One-line description of where a config connects, for logs. */

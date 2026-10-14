@@ -1,0 +1,75 @@
+﻿================================================================================
+MCP STUDIO BLANK-PANEL MATRIX — @mfallah/dsh-mcp-studio
+================================================================================
+
+[A] valid host route (control)
+    applyError : none
+    renderError: none
+    windowError: none
+    consoleErr : none
+    htmlLength : 3479
+    htmlHead   : <div class="mcp-studio" dir="rtl" lang="fa"><header class="mcp-header"><div class="mcp-header-top"><div class="mcp-header-titles"><h1>title</h1><p class="mcp-su
+
+[B] route missing: SPA answers text/html
+    applyError : none
+    renderError: none
+    windowError: none
+    consoleErr : none
+    htmlLength : 2432
+    htmlHead   : <div class="mcp-studio" dir="rtl" lang="fa"><header class="mcp-header"><div class="mcp-header-top"><div class="mcp-header-titles"><h1>title</h1><p class="mcp-su
+
+[C] host route answers ok:false
+    applyError : none
+    renderError: none
+    windowError: none
+    consoleErr : none
+    htmlLength : 2398
+    htmlHead   : <div class="mcp-studio" dir="rtl" lang="fa"><header class="mcp-header"><div class="mcp-header-top"><div class="mcp-header-titles"><h1>title</h1><p class="mcp-su
+
+[D] H1: fresh object per getSnapshot
+    applyError : none
+    renderError: none
+    windowError: none
+    consoleErr : none
+    htmlLength : 3479
+    htmlHead   : <div class="mcp-studio" dir="rtl" lang="fa"><header class="mcp-header"><div class="mcp-header-top"><div class="mcp-header-titles"><h1>title</h1><p class="mcp-su
+
+[E] H2: locale methods need `this`
+    applyError : none
+    renderError: TypeError: Cannot read properties of undefined (reading 'listeners')
+    windowError: Cannot read properties of undefined (reading 'listeners')
+    consoleErr : Error: Uncaught [TypeError: Cannot read properties of undefined (reading 'listeners')] | The above error occurred in the <McpStudioPanel> component:
+    htmlLength : 0  <-- EMPTY TREE
+    htmlHead   : 
+
+[F] H3: snapshot.active is an object
+    applyError : none
+    renderError: TypeError: active.startsWith is not a function
+    windowError: active.startsWith is not a function | active.startsWith is not a function
+    consoleErr : Error: Uncaught [TypeError: active.startsWith is not a function] | Error: Uncaught [TypeError: active.startsWith is not a function] | The above error occurred in the <McpStudioPanel> component:
+    htmlLength : 0  <-- EMPTY TREE
+    htmlHead   : 
+
+[G] H4a: no locale prop
+    applyError : none
+    renderError: none
+    windowError: none
+    consoleErr : none
+    htmlLength : 3479
+    htmlHead   : <div class="mcp-studio" dir="ltr" lang="en"><header class="mcp-header"><div class="mcp-header-top"><div class="mcp-header-titles"><h1>title</h1><p class="mcp-su
+
+[H] H4b: no controller prop
+    applyError : none
+    renderError: TypeError: Cannot read properties of undefined (reading 'subscribe')
+    windowError: Cannot read properties of undefined (reading 'subscribe') | Cannot read properties of undefined (reading 'subscribe')
+    consoleErr : Error: Uncaught [TypeError: Cannot read properties of undefined (reading 'subscribe')] | Error: Uncaught [TypeError: Cannot read properties of undefined (reading 'subscribe')] | The above error occurred in the <McpStudioPanel> component:
+    htmlLength : 0  <-- EMPTY TREE
+    htmlHead   : 
+
+[I] H4c: no t prop
+    applyError : none
+    renderError: TypeError: t is not a function
+    windowError: t is not a function | t is not a function
+    consoleErr : Error: Uncaught [TypeError: t is not a function] | Error: Uncaught [TypeError: t is not a function] | The above error occurred in the <McpStudioPanel> component:
+    htmlLength : 0  <-- EMPTY TREE
+    htmlHead   : 

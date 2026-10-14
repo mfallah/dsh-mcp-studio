@@ -1,0 +1,38 @@
+﻿
+==============================================================================
+A/B — prototype-method ctx.locale (real LocaleRuntime shape)
+==============================================================================
+
+### PRE-FIX  (git c01a62e:lib/client.js)
+    bundle      : F:\harness\dsh-mcp-studio\tests\e2e\old-client.js
+    applyError  : none
+    renderError : TypeError: Cannot read properties of undefined (reading 'listeners')
+    windowErrors: TypeError: Cannot read properties of undefined (reading 'listeners')
+    consoleErr  : Error: Uncaught [TypeError: Cannot read properties of undefined (reading 'listeners')] | The above error occurred in the <McpStudioPanel> component:
+    htmlLength  : 0   <-- WHITE PAGE
+    htmlHead    : 
+
+### CURRENT  (working tree lib/client.js)
+    bundle      : F:\harness\dsh-mcp-studio\lib\client.js
+    applyError  : none
+    renderError : none
+    windowErrors: none
+    consoleErr  : none
+    htmlLength  : 3479
+    htmlHead    : <div class="mcp-studio" dir="rtl" lang="fa"><header class="mcp-header"><div class="mcp-header-top"><div class="mcp-header-titles"><h1>title<
+
+VERBATIM pre-fix render error:
+TypeError: Cannot read properties of undefined (reading 'listeners')
+    at subscribe (file:///F:/harness/dsh-mcp-studio/tests/e2e/probe-ab-this-binding.mjs:68:10)
+    at subscribeToStore (F:\harness\dsh-mcp-studio\node_modules\.pnpm\react-dom@18.3.1_react@18.3.1\node_modules\react-dom\cjs\react-dom.development.js:16139:10)
+    at commitHookEffectListMount (F:\harness\dsh-mcp-studio\node_modules\.pnpm\react-dom@18.3.1_react@18.3.1\node_modules\react-dom\cjs\react-dom.development.js:23189:26)
+    at commitPassiveMountOnFiber (F:\harness\dsh-mcp-studio\node_modules\.pnpm\react-dom@18.3.1_react@18.3.1\node_modules\react-dom\cjs\react-dom.development.js:24970:11)
+    at commitPassiveMountEffects_complete (F:\harness\dsh-mcp-studio\node_modules\.pnpm\react-dom@18.3.1_react@18.3.1\node_modules\react-dom\cjs\react-dom.development.js:24930:9)
+    at commitPassiveMountEffects_begin (F:\harness\dsh-mcp-studio\node_modules\.pnpm\react-dom@18.3.1_react@18.3.1\node_modules\react-dom\cjs\react-dom.development.js:24917:7)
+    at commitPassiveMountEffects (F:\harness\dsh-mcp-studio\node_modules\.pnpm\react-dom@18.3.1_react@18.3.1\node_modules\react-dom\cjs\react-dom.development.js:24905:3)
+    at flushPassiveEffectsImpl (F:\harness\dsh-mcp-studio\node_modules\.pnpm\react-dom@18.3.1_react@18.3.1\node_modules\react-dom\cjs\react-dom.development.js:27078:3)
+    at flushPassiveEffects (F:\harness\dsh-mcp-studio\node_modules\.pnpm\react-dom@18.3.1_react@18.3.1\node_modules\react-dom\cjs\react-dom.development.js:27023:14)
+    at F:\harness\dsh-mcp-studio\node_modules\.pnpm\react-dom@18.3.1_react@18.3.1\node_modules\react-dom\cjs\react-dom.development.js:26808:9
+
+VERBATIM pre-fix window.onerror:
+TypeError: Cannot read properties of undefined (reading 'listeners')

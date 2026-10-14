@@ -9,6 +9,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { en } from '../../src/client/locales/en.js'
 import { fa } from '../../src/client/locales/fa.js'
 import { McpStudioPanel } from '../../src/client/panel/McpStudioPage.js'
+import { ProbePanel } from '../../src/client/panel/parts/ProbePanel.js'
 import { McpStudioController } from '../../src/client/state.js'
 import { createFakeApi, flush, makeDetail, makeEntry, makeServer, makeT } from './fake-api.js'
 
@@ -280,6 +281,31 @@ describe('installed servers', () => {
 
     expect(container.textContent).toContain('GITHUB_TOKEN')
     expect(container.textContent).toContain('only names travel to this panel')
+  })
+})
+
+describe('probe codes', () => {
+  it('explains a namespace collision in words instead of the raw host error', () => {
+    mount(
+      <ProbePanel
+        t={tEn}
+        view={{
+          phase: 'ready',
+          value: {
+            ok: false,
+            code: 'namespace-in-use',
+            error: 'tool "read_file" is already registered',
+            durationMs: 7,
+          },
+        }}
+      />,
+    )
+
+    const text = container.textContent ?? ''
+    expect(text).toContain('This tool namespace is already owned by an MCP server outside this panel')
+    expect(text).toContain('choose a different server name')
+    // The host's own message is still shown, so the user can match it to the log.
+    expect(text).toContain('already registered')
   })
 })
 
