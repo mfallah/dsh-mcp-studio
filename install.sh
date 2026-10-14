@@ -260,7 +260,11 @@ append_patch_block() {
     printf '%s\n' '      config:'
     printf '%s\n' '        catalogEnabled: true'
     printf '%s\n' '        registryUrl: https://registry.modelcontextprotocol.io'
-    printf '%s\n' '        probeTimeoutMs: 15000'
+    # Match the shipped bundle layer in patch.yml: a cold `npx -y` download
+    # routinely exceeds 15s, and a tight budget reports a healthy server as
+    # unreachable. Keep these in step with patch.yml and src/host/index.ts.
+    printf '%s\n' '        probeTimeoutMs: 60000'
+    printf '%s\n' '        mountTimeoutMs: 90000'
     printf '%s\n' "$PATCH_END"
   } >> "$PATCH_FILE"
   return 0

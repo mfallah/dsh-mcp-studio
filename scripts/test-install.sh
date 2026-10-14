@@ -90,6 +90,11 @@ if [ -f "$HOME_DIR/mcp-studio/backups"/*/cordis.patch.yml ]; then ok 'backup con
 if [ -f "$HOME_DIR/mcp-studio/backups"/*/manifest.json ]; then ok 'backup contains manifest.json'; else bad 'backup contains manifest.json'; fi
 check "$(grep -cF "$PATCH_BEGIN" "$PROFILE_DIR/cordis.patch.yml")" '1' 'patch block appended once'
 check "$(grep -cF "user-thing" "$PROFILE_DIR/cordis.patch.yml")" '1' 'pre-existing user entry preserved'
+# The managed block must carry the shipped budgets (patch.yml / host Config),
+# not an older tighter pair that would report healthy servers as unreachable.
+check "$(grep -cF 'probeTimeoutMs: 60000' "$PROFILE_DIR/cordis.patch.yml")" '1' 'managed block carries the shipped probe budget'
+check "$(grep -cF 'mountTimeoutMs: 90000' "$PROFILE_DIR/cordis.patch.yml")" '1' 'managed block carries the shipped mount budget'
+check "$(grep -cF '15000' "$PROFILE_DIR/cordis.patch.yml" || true)" '0' 'managed block does not pin the old 15s probe budget'
 
 # --- idempotency ------------------------------------------------------------
 printf '\n--second run is idempotent\n'

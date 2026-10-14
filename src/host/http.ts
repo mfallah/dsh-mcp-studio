@@ -112,21 +112,58 @@ function fetchSiteAllowed(req: IncomingMessage): boolean {
   return value === 'same-origin' || value === 'none'
 }
 
-async function readBody(req: IncomingMessage): Promise<string> {
-  return await new Promise<string>((resolve, reject) => {
+/**
+ * Hard cap on how much of an over-limit body is drained before the socket is
+ * dropped. A body slightly over the limit still gets a clean 413; a sender
+ * streaming gigabytes gets cut off instead of consuming memory or time.
+ */
+const MAX_DRAIN_BYTES = MAX_BODY_BYTES * 8
+
+interface BodyResult {
+  /** The body exceeded {@link MAX_BODY_BYTES}; `text` is empty. */
+  tooLarge: boolean
+  text: string
+}
+
+/**
+ * Read a request body without ever exceeding {@link MAX_BODY_BYTES} of memory.
+ *
+ * An over-limit body is DRAINED rather than destroyed immediately: destroying
+ * the request before the response is written makes the client see a connection
+ * reset instead of the documented 413. Drain is capped, so a hostile sender
+ * cannot hold the connection open for free.
+ */
+async function readBody(req: IncomingMessage): Promise<BodyResult> {
+  return await new Promise<BodyResult>((resolve, reject) => {
     const chunks: Buffer[] = []
     let size = 0
+    let tooLarge = false
+    let settled = false
     req.on('data', (chunk: Buffer) => {
+      if (settled) return
       size += chunk.length
       if (size > MAX_BODY_BYTES) {
-        reject(new Error(`request body exceeds ${MAX_BODY_BYTES} bytes`))
-        req.destroy()
+        tooLarge = true
+        chunks.length = 0
+        if (size > MAX_DRAIN_BYTES) {
+          settled = true
+          req.destroy()
+          resolve({ tooLarge: true, text: '' })
+        }
         return
       }
       chunks.push(chunk)
     })
-    req.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')))
-    req.on('error', reject)
+    req.on('end', () => {
+      if (settled) return
+      settled = true
+      resolve({ tooLarge, text: tooLarge ? '' : Buffer.concat(chunks).toString('utf8') })
+    })
+    req.on('error', (error) => {
+      if (settled) return
+      settled = true
+      reject(error)
+    })
   })
 }
 
@@ -185,13 +222,19 @@ export function registerApi(webServer: WebServerLike, dispatch: RpcDispatch, fac
       return
     }
 
-    let raw: string
+    let body: BodyResult
     try {
-      raw = await readBody(req)
+      body = await readBody(req)
     } catch (error) {
-      fail(res, 413, error instanceof Error ? error.message : 'unreadable body', 'body-too-large')
+      fail(res, 400, error instanceof Error ? error.message : 'unreadable body', 'body-unreadable')
       return
     }
+    if (body.tooLarge) {
+      res.setHeader('connection', 'close')
+      fail(res, 413, `request body exceeds ${MAX_BODY_BYTES} bytes`, 'body-too-large')
+      return
+    }
+    const raw = body.text
 
     let parsed: unknown
     try {

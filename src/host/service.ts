@@ -168,9 +168,19 @@ export class McpStudioService implements McpStudioApi {
     if (title.length === 0) {
       throw new McpStudioError('invalid-title', 'a display title is required')
     }
-    const transport = draft.transport === 'streamable-http' ? 'streamable-http' : 'stdio'
+    // An unknown transport is a caller bug, not a request to guess. Coercing it
+    // to stdio would connect something the user never asked for.
+    if (draft.transport !== 'stdio' && draft.transport !== 'streamable-http') {
+      throw new McpStudioError(
+        'invalid-transport',
+        `transport must be "stdio" or "streamable-http", received "${String(draft.transport)}"`,
+      )
+    }
+    const transport = draft.transport
+    // The name is validated, never truncated: silently shortening a 33-character
+    // name would register a namespace the user did not choose.
     const requested =
-      clean(draft.serverName ?? '', 32) ||
+      clean(draft.serverName ?? '', 64) ||
       (options.existing?.serverName ?? '') ||
       slugifyServerName(title)
     if (!SERVER_NAME_RE.test(requested)) {
@@ -235,14 +245,18 @@ export class McpStudioService implements McpStudioApi {
     return config
   }
 
-  /** Build a config for a draft without persisting it, for probes. */
+  /**
+   * Build a config for a draft without persisting it, for probes.
+   *
+   * The probe deliberately gets its own throwaway `serverName` BEFORE validation
+   * runs. Passing the draft's real name here would trip the duplicate-name guard
+   * for exactly the case the user most wants to test: re-checking a server that
+   * is already installed. `ConnectionSupervisor.probe()` assigns a second random
+   * name when it actually mounts, so nothing here can shadow a live server.
+   */
   private draftToProbeConfig(draft: ServerDraft): ServerConfig {
-    const clashFree = { ...draft }
-    const requested = clean(draft.serverName ?? '', 32) || slugifyServerName(clean(draft.title, 120) || 'probe')
-    clashFree.serverName = requested
-    const id = `probe${Math.random().toString(36).slice(2, 8)}`
-    const provisional = this.draftToConfig(clashFree, { id })
-    return provisional
+    const suffix = Math.random().toString(36).slice(2, 10)
+    return this.draftToConfig({ ...draft, serverName: `probe-${suffix}` }, { id: `probe${suffix}` })
   }
 
   // -- servers ---------------------------------------------------------------

@@ -548,6 +548,51 @@ const SENTINEL = 'SENTINEL-9f3a7c1d-DO-NOT-LEAK'
   rmSync(dir, { recursive: true, force: true })
 }
 
+// ===========================================================================
+// I. Re-verification of the reported defects D3 (name cap) and D5 (transport).
+//    These are written to assert the CORRECT behaviour, so they fail on the
+//    revision where the defect existed and pass once it is fixed.
+// ===========================================================================
+{
+  const dir = mkdtempSync(join(tmpdir(), 'mcp-studio-adv-i-'))
+  const h = await boot(dir)
+
+  const tooLong = await h.rpc('addServer', {
+    transport: 'stdio',
+    title: 'Too Long',
+    serverName: 'a'.repeat(33),
+    command: 'definitely-not-a-command-xyz',
+    args: [],
+  })
+  check(
+    'D3: a 33-character serverName is rejected, never truncated',
+    tooLong.body.ok === false && tooLong.body.error?.code === 'invalid-server-name',
+    JSON.stringify(tooLong.body).slice(0, 200),
+  )
+
+  const badTransport = await h.rpc('addServer', {
+    transport: 'sse',
+    title: 'SSE attempt',
+    serverName: 'sseattempt',
+    command: 'npx',
+    args: [],
+  })
+  check(
+    'D5: an unrecognised transport is rejected as invalid-transport',
+    badTransport.body.ok === false && badTransport.body.error?.code === 'invalid-transport',
+    JSON.stringify(badTransport.body).slice(0, 200),
+  )
+  const listed = await h.rpc('listServers')
+  check(
+    'D5: the rejected transport persisted nothing',
+    listed.body.ok === true && listed.body.value.length === 0,
+    `count=${listed.body.value?.length}`,
+  )
+
+  await h.dispose()
+  rmSync(dir, { recursive: true, force: true })
+}
+
 console.log(`\n${failures.length === 0 ? 'ADVERSARIAL OK' : `ADVERSARIAL FAILED: ${failures.length} of ${results.length}`}`)
 console.log(`elapsed ${Date.now() - started}ms`)
 console.log(JSON.stringify({ pass: results.filter((r) => r.ok).length, fail: failures.length, failures }))

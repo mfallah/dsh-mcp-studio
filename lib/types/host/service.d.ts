@@ -49,7 +49,15 @@ export declare class McpStudioService implements McpStudioApi {
     private view;
     /** Turn a validated draft into a persistable config. */
     private draftToConfig;
-    /** Build a config for a draft without persisting it, for probes. */
+    /**
+     * Build a config for a draft without persisting it, for probes.
+     *
+     * The probe deliberately gets its own throwaway `serverName` BEFORE validation
+     * runs. Passing the draft's real name here would trip the duplicate-name guard
+     * for exactly the case the user most wants to test: re-checking a server that
+     * is already installed. `ConnectionSupervisor.probe()` assigns a second random
+     * name when it actually mounts, so nothing here can shadow a live server.
+     */
     private draftToProbeConfig;
     listServers(): Promise<ServerView[]>;
     getServer(id: string): Promise<ServerDetail | null>;

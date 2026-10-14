@@ -311,7 +311,11 @@ function Get-PatchBlockLines {
         '      config:',
         '        catalogEnabled: true',
         '        registryUrl: https://registry.modelcontextprotocol.io',
-        '        probeTimeoutMs: 15000',
+        # Match the shipped bundle layer in patch.yml: a cold `npx -y` download
+        # routinely exceeds 15s, and a tight budget reports a healthy server as
+        # unreachable. Keep these in step with patch.yml and src/host/index.ts.
+        '        probeTimeoutMs: 60000',
+        '        mountTimeoutMs: 90000',
         $PatchEnd
     )
 }

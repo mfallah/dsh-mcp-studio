@@ -110,6 +110,11 @@ try {
     Assert-True -Condition (-not $text.Contains('[]')) -What 'empty root [] is dropped so the appended list stays valid YAML'
     $firstLive = @($text -split "`n" | Where-Object { $_.Trim() -ne '' -and -not $_.Trim().StartsWith('#') })[0]
     Assert-Equal -Actual $firstLive -Expected '- insert:' -What 'the appended entry list is the file root'
+    # The managed block must carry the shipped budgets (patch.yml / host Config),
+    # not an older tighter pair that would report healthy servers as unreachable.
+    Assert-True -Condition ($text.Contains('probeTimeoutMs: 60000')) -What 'managed block carries the shipped probe budget'
+    Assert-True -Condition ($text.Contains('mountTimeoutMs: 90000')) -What 'managed block carries the shipped mount budget'
+    Assert-True -Condition (-not $text.Contains('15000')) -What 'managed block does not pin the old 15s probe budget'
 
     Assert-True -Condition (Remove-ManagedPatchBlock -PatchFile $patchFile) -What 'Remove strips the block'
     Assert-True -Condition (-not (Test-PatchBlockPresent -PatchFile $patchFile)) -What 'block gone after Remove'

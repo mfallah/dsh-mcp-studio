@@ -203,6 +203,54 @@ check('catalogCategories returns tags', categories.body.ok === true && categorie
 const exportPatch = await rpc('exportPatch')
 check('exportPatch renders YAML', exportPatch.body.ok === true && exportPatch.body.value.includes('dsh-mcp-client'))
 
+// --- regression guards for defects found by independent verification ---------
+// D1: re-testing an ALREADY INSTALLED server must work. The probe has to use a
+// throwaway name, not the draft's real one, or the duplicate-name guard refuses
+// exactly the case a user is most likely to try.
+const reProbe = await rpc('testConnection', {
+  transport: 'stdio',
+  title: 'Memory (re-test)',
+  serverName: 'memory',
+  command: 'npx',
+  args: ['-y', '@modelcontextprotocol/server-memory@2026.7.4'],
+  env: { MEMORY_FILE_PATH: join(storeDir, 'reprobe.jsonl') },
+})
+check(
+  'D1 testConnection accepts an already-installed serverName',
+  reProbe.body.value?.ok === true,
+  reProbe.body.value?.error ?? '',
+)
+
+// D2: an oversized body must be answered with 413, not a connection reset.
+const oversized = await fetch(`${base}/mcp-studio-api/rpc`, {
+  method: 'POST',
+  headers: { 'content-type': 'application/json', 'x-mcp-studio': '1' },
+  body: JSON.stringify({ method: 'listServers', args: [], pad: 'x'.repeat(2 * 1024 * 1024) }),
+}).catch((error) => ({ status: 0, statusText: String(error) }))
+check('D2 an oversized body answers 413', oversized.status === 413, `status ${oversized.status}`)
+
+// D3: an over-long serverName must be refused, never silently truncated.
+const longName = await rpc('addServer', {
+  transport: 'stdio',
+  title: 'Too Long',
+  serverName: 'a'.repeat(33),
+  command: 'npx',
+  args: [],
+})
+check(
+  'D3 an over-long serverName is refused, not truncated',
+  longName.body.ok === false && longName.body.error?.code === 'invalid-server-name',
+  JSON.stringify(longName.body).slice(0, 160),
+)
+
+// D5: an unknown transport must be refused, never silently coerced to stdio.
+const badTransport = await rpc('addServer', { transport: 'sse', title: 'Nope', command: 'npx' })
+check(
+  'D5 an unknown transport is refused',
+  badTransport.body.ok === false && badTransport.body.error?.code === 'invalid-transport',
+  JSON.stringify(badTransport.body).slice(0, 160),
+)
+
 // --- removal -----------------------------------------------------------------
 const removed = await rpc('removeServer', memory?.id)
 check('removeServer succeeds', removed.body.ok === true)
