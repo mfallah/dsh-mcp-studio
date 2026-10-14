@@ -88,9 +88,13 @@ async function post(body, label) {
 }
 
 await post({ method: 'listServers', args: [] }, 'small body (1 KiB)')
-await post({ method: 'listServers', args: ['x'.repeat(2 * 1024 * 1024)] }, 'oversized body (2 MiB)')
+await post({ method: 'listServers', args: ['x'.repeat(2 * 1024 * 1024)] }, 'oversized body (2 MiB, under the drain cap)')
 await post({ method: 'listServers', args: [] }, 'small body after the oversized one')
-console.log(`expected by docs/http.ts: 413 with a JSON error envelope`)
+// Over the hard drain cap (8x the 1 MiB limit) the socket is dropped instead of drained.
+await post({ method: 'listServers', args: ['x'.repeat(16 * 1024 * 1024)] }, 'hostile body (16 MiB, over the drain cap)')
+await post({ method: 'listServers', args: [] }, 'small body after the hostile one')
+console.log(`expected by docs/http.ts: 413 with a JSON error envelope under the drain cap;`)
+console.log(`no 200 and a dropped socket over it, with the server still serving afterwards`)
 
 await fiber.dispose()
 server.close()

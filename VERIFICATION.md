@@ -515,3 +515,165 @@ rather than coercing.
   name is already installed), **D2** (oversized body → `ECONNRESET` instead of `413`), **D3** (silent
   32-char truncation), plus docs drift **D4** and coercion **D5**. None of them was fixed by me; the
   frozen tree at `19f2cd16` is exactly what was tested.
+
+---
+
+# Re-verification pass — `c01a62e42c05c5a235fdb6cc1bc20d2f253fa801`
+
+The sections above are the **first** pass and are left exactly as written. This section is the second
+pass, run after the team landed a fix commit. Nothing above was edited.
+
+**Revision tested:** `c01a62e42c05c5a235fdb6cc1bc20d2f253fa801`
+(`fix: address defects found by independent verification`), parent `19f2cd16`, branch `main`,
+pushed. Working tree clean at the start of the pass (`git status --short` empty).
+
+**Artifact hashes for this pass:**
+
+| Artifact | SHA-256 |
+| --- | --- |
+| commit | `c01a62e42c05c5a235fdb6cc1bc20d2f253fa801` |
+| `lib/index.js` | `3b5655f7ba888511246ae7c89e3357451781da1c303bf5d72c3c3ee5476ec4f2` |
+| `lib/client.js` (unchanged from pass 1) | `1b628b4aabf2a793cd3ffd0f3461f27307100b7b1c396ed5cdb4e8c9a8a356e6` |
+| `lib/index.js.map` | `9faac33d51004108e51fa0d49f36b3746baba2965e8e88363155e033ab7a26fb` |
+| `src/host/service.ts` | `044c4f242e15f70106e52f788d8de95327c82ea1d7cf5a4ad9a8af9c688a69be` |
+| `src/host/http.ts` | `76f2165a7cced21a064e46d2f062903b67edffcc8096e3787148889de9575de0` |
+| `src/host/connection.ts` (unchanged) | `30c7a4baf6ff261e79378edfe29e3e50bcb9ca42003778676838e95940065cd6` |
+| `src/host/secrets.ts` (unchanged) | `b20fd54da245633d1d21dfd512000e5c08121c0cdf708afcaf76eefdd4e736c9` |
+
+**Important scope limit.** The running harness process was **not** restarted (forbidden), so it still
+executes the pass-1 host bundle `6288efbd…`. Every fix below was verified against the new built
+artifact `3b5655f7…` booted in isolation by my own scripts — not against the live process. The only
+live checks I re-ran are liveness ones: `GET /mcp-studio-api/health` → `200
+{"ok":true,...,"servers":1}` and `listServers` → `thinking=connected/1`. The new bundle will only be
+live after the next `dsh web` restart.
+
+## Verdict per defect
+
+| Defect | Status | My evidence (this pass) |
+| --- | --- | --- |
+| **D1** probe rejects an already-installed `serverName` | **FIXED — VERIFIED** | see below |
+| **D2** oversized body → reset instead of `413` | **FIXED — VERIFIED** | see below |
+| **D3** 33-char `serverName` silently truncated | **FIXED — VERIFIED** | see below |
+| **D4** docs/installers pin the wrong timeouts | **FIXED — VERIFIED** | see below |
+| **D5** unknown `transport` coerced to `stdio` | **FIXED — VERIFIED** | see below |
+
+### D1 — FIXED — VERIFIED
+
+`node tests/e2e/docs-claims-runtime.mjs` (my script; it asserts the *correct* behaviour, and failed
+on `19f2cd16`):
+
+```
+PASS  live server connects — status=connected err=undefined
+PASS  probe against the live name succeeds — {"ok":true,"durationMs":8409,"tools":["sequentialthinking"]}
+PASS  probe did not add or duplicate mcp__livetarget__* tools — before=[mcp__livetarget__sequentialthinking] after=[mcp__livetarget__sequentialthinking]
+PASS  probe fibers are disposed (no mcp__probe-* registrations left) — leftover=[]
+PASS  live row is still connected after the probe — status=connected
+CLAIMS OK
+CLAIMS_EXIT=0
+```
+
+This is exactly the required shape: `ok: true` *and* the probe's own tool list, with the live row
+untouched. Source: [`src/host/service.ts:257-260`](src/host/service.ts#L257-L260) now builds the
+temporary name **before** handing the draft to `draftToConfig`, so the duplicate-name guard at
+[:192-194](src/host/service.ts#L192-L194) never sees the installed name. The team's smoke suite also
+passes `D1 testConnection accepts an already-installed serverName` (I re-ran it myself).
+
+I also re-ran the raw live reproduction from pass 1 against the harness — it still returns
+`invalid-config`, because the live process is the **old** bundle. That is expected and is not a
+counter-example; it is the reason the live process must be restarted to pick up the fix.
+
+### D2 — FIXED — VERIFIED
+
+`node tests/e2e/oversized-body.mjs` (extended this pass to also exercise the drain cap):
+
+```
+small body (1 KiB):                              {"event":"response","status":200,"body":"{\"ok\":true,\"value\":[]}"}
+oversized body (2 MiB, under the drain cap):     {"event":"response","status":413,"body":"{\"ok\":false,\"error\":{\"message\":\"request body exceeds 1048576 bytes\",\"code\":\"body-too-large\"}}"}
+small body after the oversized one:              {"event":"response","status":200,...}
+hostile body (16 MiB, over the drain cap):       {"event":"error","code":"ECONNRESET","message":"read ECONNRESET"}
+small body after the hostile one:                {"event":"response","status":200,...}
+```
+
+The documented `413` with a JSON `body-too-large` envelope now arrives, and the next request is
+served. Over the hard drain cap (8× the limit) the socket is still dropped and the server survives —
+so the fix does not trade a reset for an unbounded drain. Source:
+[`src/host/http.ts:120`](src/host/http.ts#L120) `MAX_DRAIN_BYTES = MAX_BODY_BYTES * 8`,
+[:142-161](src/host/http.ts#L142-L161) drains instead of destroying, [:232-234](src/host/http.ts#L232-L234)
+answers `413` with `connection: close`.
+
+### D3 — FIXED — VERIFIED
+
+```
+PASS  D3: a 33-character serverName is rejected, never truncated —
+      {"ok":false,"error":{"message":"server name \"aaaa…a\" must match /^[A-Za-z0-9_-]{1,32}$/","code":"invalid-server-name"}}
+PASS  33-character serverName is rejected as invalid-server-name   (docs-claims-runtime.mjs)
+```
+
+Source: [`src/host/service.ts:180-191`](src/host/service.ts#L180-L191) — the explicit name is now
+`clean(..., 64)` and then hard-validated by `SERVER_NAME_RE`; the silent 32-char cut is gone.
+
+### D4 — FIXED — VERIFIED
+
+```
+docs/USAGE.md:147:            probeTimeoutMs: 60000           # سقف آزمون اتصال
+docs/USAGE.md:148:            mountTimeoutMs: 90000           # سقف سوار کردن هر سرور در زمان بالا آمدن
+docs/TROUBLESHOOTING.md:51:   … `probeTimeoutMs` را بالا ببر (پیشفرض ۶۰۰۰۰ میلیثانیه؛ سقف ۶۰۰۰۰۰).
+install.ps1:317:              '        probeTimeoutMs: 60000',
+install.ps1:318:              '        mountTimeoutMs: 90000',
+install.sh:266/267:           '        probeTimeoutMs: 60000' / '        mountTimeoutMs: 90000'
+scripts/test-install.ps1:115-117:  asserts 60000, 90000, and NOT 15000
+scripts/test-install.sh:95-97:     asserts 60000, 90000, and NOT 15000
+```
+
+The values now match `patch.yml` and the live `--dump-config` (`60000`/`90000`), and both installer
+suites pin them so the drift cannot silently return.
+
+### D5 — FIXED — VERIFIED
+
+```
+PASS  D5: an unrecognised transport is rejected as invalid-transport —
+      {"ok":false,"error":{"message":"transport must be \"stdio\" or \"streamable-http\", received \"sse\"","code":"invalid-transport"}}
+PASS  D5: the rejected transport persisted nothing — count=0
+```
+
+Source: [`src/host/service.ts:171-179`](src/host/service.ts#L171-L179).
+
+## No-regression evidence on `c01a62e`
+
+| Check | Command | Result |
+| --- | --- | --- |
+| Typecheck | `npx tsc --noEmit` | exit 0, no diagnostics |
+| Unit tests | `npx vitest run` | 11 files, **188/188 passed**, exit 0 |
+| Build reproducibility | `node build.mjs` then `git diff --exit-code -- lib` | exit 0 / exit 0; `git status --short -- lib` empty; hashes unchanged (`3b5655f7…`, `1b628b4a…`, `9faac33d…`) |
+| My adversarial suite | `node tests/e2e/adversarial-host-api.mjs` | **ADVERSARIAL OK — 47/47 pass** (was 43/44). Includes the new D3/D5 section and the D2 `413` check |
+| Secret non-leakage | same script, section F | still PASS: only `secrets.json` contains the sentinel; no RPC body / log / error does |
+| Corruption resilience | same script, section G | still PASS: quarantine + original bytes + writable store |
+| Second e2e path | same script, section H | still PASS: `mcp__seqthink__sequentialthinking` |
+| Team smoke suite | `node .smoke/host-smoke.mjs` | **SMOKE OK**, 39 PASS including `D1`/`D2`/`D3`/`D5` (re-run by me, not taken on trust) |
+| Installer (PS) | `powershell -NoProfile -File scripts/test-install.ps1` | **PASSED: 28 checks**, exit 0 |
+| Installer (bash) | `& 'C:\Program Files\Git\bin\bash.exe' scripts/test-install.sh` | **PASSED: 18 checks**, exit 0 — the pass-1 INCONCLUSIVE is now **resolved** |
+| Docs guard | `node scripts/check-docs.mjs` | `docs-check: ok (6 files, …)`, exit 0 |
+
+## Residual observations on the fix
+
+1. **D2 drains instead of resetting, so the connection is held until the body ends or 8 MiB is
+   exceeded.** A client that sends just under 8 MiB and then stalls holds the socket until the
+   harness's own HTTP timeout fires (Node's default `server.requestTimeout` is 300 s). I did **not**
+   run a slow-loris test, so this is an untested residual, not a proven defect. It is the only new
+   attack surface the fix introduces, and it is bounded by the underlying `dsh-host-webserver`
+   timeouts.
+2. **The running harness still serves `6288efbd…`.** Until the user restarts `dsh web` (which I must
+   not do), the live panel keeps executing the pass-1 code, including D1/D2. A restart is required
+   for the fixes to take effect in the user's session.
+3. `lib/client.js` is unchanged between the two commits, which is consistent with the delta being
+   host-only.
+
+## Fitness to ship
+
+**Yes — fit to ship from this revision, subject to the restart caveat.** All five defects are fixed
+and independently re-verified with my own scripts against the built artifact `3b5655f7…`; the full
+unit suite, typecheck, build-reproducibility gate, both installer suites, the docs guard, the team
+smoke suite and my 47-check adversarial suite are green; and the secret-non-leakage, corruption,
+duplicate-name and second-server paths still hold. The two things a reader must not misread: the
+fixes were verified in isolation, not in the live process, and the new bundle only becomes the live
+one after a `dsh web` restart that I deliberately did not perform.
